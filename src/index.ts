@@ -1,19 +1,27 @@
 import dotenv from "dotenv";
 import express from "express";
 
-// 환결설정 파일을 불러오는 dotenv라이브러리 호출
+
 dotenv.config();
 
-// 백엔드를 구성하는 express 앱 만들기
-const app = express();
 
-// 환경변수중 key가 PORT인 값을 가져오되, 가져올 수 없다면 8080을 PORT 변수에 할당
-// 환결변수에서 가져오는 값은 string | undefined
+const app = express(); // 1. 이줄과
+
+
 const PORT = process.env.PORT || "8080";
 
-// 실제 app 구동
-// app.listen(여는 포트번호, 서버가 실행되면서 해야 하는 함수)
+// express 앱에 기능을 확장할 때에는 app.use() 메서드 사용
+
+// express.json() : 요청(Request)의 본문(body)에서 JSON에 데이터를 객체로 변환 (파싱)하여 request.body에 저장
+app.use(express.json());
+
+// express.urlencoded : 요청(Request)으로 본문 에서 URL-encoded 데이터를 객체로 변환(파싱)하여 request.body에 저장
+// URL은 한글을 원래 포함 할 수 없기 때문에 변환을 하게되는데 , 그것을 한글로 받아들일 수 있도록 하는 기능
+app.use(express.urlencoded({ extended: true }));
+
 app.listen(PORT, () => {
-    console.log(`서버실행! http://localhost:${PORT}`);
+    console.log(`서버실행! http://localhost:${PORT}`);  // 2. 이줄만 있으면  실행가능
 });
+
+
 

@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// prisma를 통해 사용할 DB source 종류를 기록
+datasource db {
+  provider = "mysql"
+}
+
+// 이 아렛부분에는 내가 실제 데이터베이스에 사용할 모델명을 기재 -> prisma의 문법을 통해
+enum GenderType {
+  MALE
+  FEMALE
+}
+
+enum RoleType {
+  ADMIN
+  USER
+}
+
+// model키워드는 Javascript에서는 객체가 되며, DB에서는 테이블이 됨
+// 이안에 기재하는것, [컬럼명] [타입] [옵션] 으로 작성하고
+// 옵션.....
+// @id: primary key
+// @default: default
+// @unique: unique
+// @updatedAt : 해당 칼럼이 수정될 때 자동으로 들어가는 수정 시간 갱신 옵션
+model User {
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())  // 삽입할 때 기본값으로 삽잆 시간이 기록
+  updatedAt   DateTime   @updatedAt   // 수정 할때 기본적으로 수정 시간이 기록
+  deletedAt   DateTime? // 타입에 ?를 넣으면 null을 허용한다는 뜻
+  username    String     @unique
+  password    String
+  name        String
+  nickname    String     @unique
+  email       String     @unique
+  phoneNumber String?
+  birthdate   DateTime?
+  gender      GenderType
+  role        RoleType   @default(USER)   // 삽입할때 기본값으로 USER 기록
+}
