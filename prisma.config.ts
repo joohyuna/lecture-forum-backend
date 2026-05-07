@@ -17,8 +17,8 @@ export default defineConfig({
 
     // datasource : prisma가 데이터베이스에 접근할때 사용하는 정보를 지정
     // 데이터베이스 접속 URL (MySQL, mariaDB의 경우)
-
     datasource: {
+        // mysql://아이디:비밀번호@호스트:포트/접속하는 스키마
         url: DATABASE_URL,
     },
 });

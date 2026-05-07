@@ -2,12 +2,9 @@ import dotenv from "dotenv";
 import express from "express";
 import userRouter from "./routes/userRouter.ts";
 
-
 dotenv.config();
 
-
 const app = express(); // 1. 이줄과
-
 
 const PORT = process.env.PORT || "8080";
 
@@ -22,11 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // 프론트엔드가 요청(Request)에 대하여 경로 Routing 등록
 // /user 가 나오면 userRouter로 보내
+// 라우터 빼고 전부 고정 라우팅 여기만 변경된다. 나머지는 그대로 변하지 않음
 app.use("/user", userRouter);
 
 app.listen(PORT, () => {
-    console.log(`서버실행! http://localhost:${PORT}`);  // 2. 이줄만 있으면  실행가능
+    console.log(`서버실행! http://localhost:${PORT}`); // 2. 이줄만 있으면  실행가능
 });
-
-
-
