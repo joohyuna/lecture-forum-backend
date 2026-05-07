@@ -11,7 +11,7 @@ const createUser = async (data: UserCreateInput) => {
     return prisma.user.create({
         data,
         // 실제 입력하는 칼럼 내용들을 적으면 됨
-        // 그러나 ...스레드 방식으로
+        // 그러나 ...스프레드 방식으로
         // key와 변수명이 같다 그래서 그냥 data만 씀
     });
 };
