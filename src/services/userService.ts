@@ -10,7 +10,8 @@ const createUser = async (data: UserCreateInput) => {
 
         // create를 생성하면 User 객체가 반환되는데, 그걸 바로 return 시킬거면
         // await 키워드를 생략함 대신 async는 빼면 안됨
-        return prisma.user.create({
+        // try catch 를 사용하려면 다시 await
+        return await prisma.user.create({
             data,
             // 실제 입력하는 칼럼 내용들을 적으면 됨
             // 그러나 ...스프레드 방식으로
@@ -24,23 +25,23 @@ const createUser = async (data: UserCreateInput) => {
                 // 중복된 칼럼에 어떤 것인지에 대한 정보는
                 // error.meta?.target에 들어 있는데 이 프로퍼티 타입은 string[] | undefined
                 // Prisma 에 지정된것임
-                const target = error.meta?.target as string[];
+                const errorMessage = error.message;
 
                 // 예시 target = ["username", "nickname", "email"]
                 // array의 요소중 "이 값"이 있는지 확인하는 메소드는 .includes()
                 // .find()와 비슷한 역할이지만,
                 // find는 조건을 걸어서 찾을 수 잇는 메서드이고
                 // includes는 단순히 집어넣은 값과 완벽히 같은 것이 있는지 true/false로 찾음
-                if (target?.includes("username")) {
+                if (errorMessage.includes("username")) {
                     // 상위 함수로 던지는데,
                     // 새로운 자바스크립트 표준 객체를 만들어서 던짐.
                     // 그 내용은 ALREADY_EXISTS_USERNAME이라고 담아서 .
                     throw new Error("ALREADY_EXISTS_USERNAME");
                 }
-                if (target?.includes("email")) {
+                if (errorMessage.includes("email")) {
                     throw new Error("ALREADY_EXISTS_EMAIL");
                 }
-                if (target?.includes("nickname")) {
+                if (errorMessage.includes("nickname")) {
                     throw new Error("ALREADY_EXISTS_NICKNAME");
                 }
                 throw new Error("UNKNOWN_ERROR");

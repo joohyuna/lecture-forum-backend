@@ -50,7 +50,7 @@ const createUser = async (req: Request, res: Response) => {
         // 하지만 실제 에러가 발생되는 지점은 prisma의 에러이고, 얘는 자바스크립트 표준 규격이 아님
         if (error instanceof Error) {
             switch (error.message) {
-                case "ALREADY_EXISTS.USERNAME":
+                case "ALREADY_EXISTS_USERNAME":
                     res.status(400).json({ error: "이미 사용 중인 아이디입니다." });
                     return;
                 case "ALREADY_EXISTS_EMAIL":
