@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { UserCreateInput } from "../generated/prisma/models/User.ts";  // 안에 있는것을 가져옴
+import { UserCreateInput } from "../generated/prisma/models/User.ts"; // 안에 있는것을 가져옴
 import userService from "../services/userService.ts";
 import bcrypt from "bcrypt";
-import passwordUtil from "../utils/password/passwordUtil.ts";  //
+import passwordUtil from "../utils/password/passwordUtil.ts"; //
 
 const createUser = async (req: Request, res: Response) => {
     try {
@@ -38,8 +38,39 @@ const createUser = async (req: Request, res: Response) => {
         // 응답에 들어갈 string 데이터로 newUser를 json 가공하여 넣는다.
         res.status(201).json(newUser);
     } catch (error) {
+        // 모든 에러에 대해서 처리를 해줄 수 없음.
+        // 내가 처리해줄 수 있는 대표적 에러에 대해서 대체함
+        // 매개변수 error는 unknown타입 입
+        // unknown 타입은 any 타입처럼 모든 값들이 저장될 수 잇는 타입이지만,
+        // 사용하기 위해서는 내로밍(타입좁힘)을 통해 사용이 가능함
+        // typeof 연산자는 데이터타입을 문자열로 반환 진짜 원시타입일때만 사용하는 편임 예) Number = "Number" 로 반환
+        // instanceof 연산자는 : 대상 변수가 이 타입인지 확인을 할 때 사용하는 연산자
+        // 리턴은 Boolean (true/false) 로 나옴
+        // Controller 에 도착하는 에러는 자바스크립트 표준규격의 에러일 것이다.
+        // 하지만 실제 에러가 발생되는 지점은 prisma의 에러이고, 얘는 자바스크립트 표준 규격이 아님
+        if (error instanceof Error) {
+            switch (error.message) {
+                case "ALREADY_EXISTS.USERNAME":
+                    res.status(400).json({ error: "이미 사용 중인 아이디입니다." });
+                    return;
+                case "ALREADY_EXISTS_EMAIL":
+                    res.status(409).json({ error: "이미 사용중인 이메일 입니다." });
+                    return;
+                case "ALREADY_EXISTS_NICKNAME":
+                    res.status(409).json({ error: "이미 사용중임 닉네임입니다." });
+                    return;
+                default:
+                    console.log(error);
+                    res.status(500).json({ message: "유저 생성 중 오류가 발생했습니다." });
+            }
+        }
+
+        // username에 겹칠때
+        // nickname에 겹칠때
+        // email이 겹칠때
+
         console.log(error);
-        res.status(500).json({message: "유저 생성 중 오류가 발생했습니다."});
+        res.status(500).json({ message: "유저 생성 중 오류가 발생했습니다." });
     }
 };
 

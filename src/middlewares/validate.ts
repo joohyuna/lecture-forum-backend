@@ -18,15 +18,15 @@ export const validate = (schema: ZodType) => {
             // 여러개의 항목에서 에러가 날수 있어서 issues는 [] 임
             const errorMessage = result.error.issues.map(issue => ({
                 field: issue.path.join("."),
-                    message: issue.message,
+                message: issue.message,
             }));
 
-            res.status(400).json({message: "잘못된 입력값입니다.", errors: errorMessage});
+            res.status(400).json({ message: "잘못된 입력값입니다.", errors: errorMessage });
             return;
         }
 
         // result.success가 true(성공)의 경우가 여이게 실행됨 -> 이 함수를 끝내고 컨트롤로로 진행되어야함
         req.body = result.data;
         next();
-    }
+    };
 };

@@ -1,19 +1,53 @@
 import { UserCreateInput } from "../generated/prisma/models/User.ts";
 import prisma from "../config/prisma.ts";
+import { Prisma } from "../generated/prisma/client.ts";
 
 const createUser = async (data: UserCreateInput) => {
-    // 컨트콜러에서 만들어진 newUser를 받아서, prisma를 통해 DB에 저장
-    // prisma.태이블.create(객체) : INSERT하는 메서드 => 리턴 값이 생성된 User객체 반환
-    // 프리즈마는 DB와 통신하는 ORM임으로 당연 비동기 함수 => async - await
+    try {
+        // 컨트콜러에서 만들어진 newUser를 받아서, prisma를 통해 DB에 저장
+        // prisma.태이블.create(객체) : INSERT하는 메서드 => 리턴 값이 생성된 User객체 반환
+        // 프리즈마는 DB와 통신하는 ORM임으로 당연 비동기 함수 => async - await
 
-    // create를 생성하면 User 객체가 반환되는데, 그걸 바로 return 시킬거면
-    // await 키워드를 생략함 대신 async는 빼면 안됨
-    return prisma.user.create({
-        data,
-        // 실제 입력하는 칼럼 내용들을 적으면 됨
-        // 그러나 ...스프레드 방식으로
-        // key와 변수명이 같다 그래서 그냥 data만 씀
-    });
+        // create를 생성하면 User 객체가 반환되는데, 그걸 바로 return 시킬거면
+        // await 키워드를 생략함 대신 async는 빼면 안됨
+        return prisma.user.create({
+            data,
+            // 실제 입력하는 칼럼 내용들을 적으면 됨
+            // 그러나 ...스프레드 방식으로
+            // key와 변수명이 같다 그래서 그냥 data만 씀
+        });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            // Prisma error 객체 내부에 code 함목 밧이 "P2002"인 것이
+            // 중복값이 있을 때의 에러코드임
+            if (error.code === "P2002") {
+                // 중복된 칼럼에 어떤 것인지에 대한 정보는
+                // error.meta?.target에 들어 있는데 이 프로퍼티 타입은 string[] | undefined
+                // Prisma 에 지정된것임
+                const target = error.meta?.target as string[];
+
+                // 예시 target = ["username", "nickname", "email"]
+                // array의 요소중 "이 값"이 있는지 확인하는 메소드는 .includes()
+                // .find()와 비슷한 역할이지만,
+                // find는 조건을 걸어서 찾을 수 잇는 메서드이고
+                // includes는 단순히 집어넣은 값과 완벽히 같은 것이 있는지 true/false로 찾음
+                if (target?.includes("username")) {
+                    // 상위 함수로 던지는데,
+                    // 새로운 자바스크립트 표준 객체를 만들어서 던짐.
+                    // 그 내용은 ALREADY_EXISTS_USERNAME이라고 담아서 .
+                    throw new Error("ALREADY_EXISTS_USERNAME");
+                }
+                if (target?.includes("email")) {
+                    throw new Error("ALREADY_EXISTS_EMAIL");
+                }
+                if (target?.includes("nickname")) {
+                    throw new Error("ALREADY_EXISTS_NICKNAME");
+                }
+                throw new Error("UNKNOWN_ERROR");
+            }
+        }
+        throw new Error("UNKNOWN_ERROR"); // return과 같은데 값을 리턴하는게 아니라 에러를 리턴하는 키워드
+    }
 };
 
 export default {
