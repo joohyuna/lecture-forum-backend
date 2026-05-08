@@ -29,7 +29,7 @@ const createUser = async (req: Request, res: Response) => {
             role,
         };
         // newUser를 가지고 DB에 저장 -> service로 보내야 됨
-        // 그다음 Service에서 다시 DB에셔보내준 값을 받아서
+        // 그다음 Service에서 다시 DB에서 보내준 값을 받아서
         const newUser = await userService.createUser(userData);
 
         // 여기서 부터는 응답(Response) 처리

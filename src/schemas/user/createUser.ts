@@ -14,7 +14,7 @@ export const createUserSchema = z.object({
     gender: z.enum(GenderType),
 });
 
-// 위에서 만든 createUserSchema는 조건을 건 "객체"를 만드는 일이라, 앞으로 다룬 곳에서 사용할 타입음 만들어줘야함
+// 위에서 만든 createUserSchema는 조건을 건 "객체"를 만드는 일이라, 앞으로 다룬 곳에서 사용할 타입을 만들어줘야함
 export type CreateUserInputType = z.infer<typeof  createUserSchema>;
 
 // 검증에 사용 할 명세를 만든것이다.
