@@ -75,14 +75,21 @@ const createUser = async (req: Request, res: Response) => {
     }
 };
 
-const login = (req: Request, res: Response) => {
+const login = async (req: Request, res: Response) => {
+    try {
     // login 이라는 기능은, 들어온 비밀번호 값과 데이터베이스에서 조회에서 가져온 비밀멎놓 값을
     // 비교해야함
     // 무언가를 를 controller 에서 해주기보다 DB에서 값을 가져오는게 우선되므로
     // 그냥 서비스로 바로 보냄
     const loginData: LoginInputType = req.body;
 
-    const result = userService.login(loginData);
+    const result = await userService.login(loginData);
+
+    res.status(200).json({
+        message: "로그인에 성공했습니다.",
+        data: result,
+    });
+    } catch (error) {}
 };
 
 export default {

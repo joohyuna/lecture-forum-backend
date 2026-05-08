@@ -3,6 +3,7 @@ import prisma from "../config/prisma.ts";
 import { Prisma } from "../generated/prisma/client.ts";
 import { LoginInputType } from "../schemas/user/login.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
+import jwtUtil from "../utils/jwt/jwtUtil.ts";
 
 const createUser = async (data: UserCreateInput) => {
     try {
@@ -79,6 +80,14 @@ const login = async (data: LoginInputType) => {
 
         // 아이디와 비밀번호가 일치하는 정보가 있다는 뜻
         // 로그인 해줘야 함
+        const token = jwtUtil.generateToken(user.id);
+
+        // password와 deletedAt라는 항목은 response(응답)에 포함시킬 필요 없어서, 그걸 제회한 나머지만 safeUserInfo에 저장
+        const { password, deletedAt, ...safeUserInfo } = user;
+        return {
+            user: safeUserInfo,
+            token,
+        }
 
     } catch (error) {
 
