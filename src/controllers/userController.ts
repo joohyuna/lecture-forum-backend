@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { UserCreateInput } from "../generated/prisma/models/User.ts"; // 안에 있는것을 가져옴
 import userService from "../services/userService.ts";
 import bcrypt from "bcrypt";
-import passwordUtil from "../utils/password/passwordUtil.ts"; //
+import passwordUtil from "../utils/password/passwordUtil.ts";
+import {LoginInputType} from "../schemas/user/login.ts"; //
 
 const createUser = async (req: Request, res: Response) => {
     try {
@@ -74,6 +75,18 @@ const createUser = async (req: Request, res: Response) => {
     }
 };
 
+const login = (req: Request, res: Response) => {
+    // login 이라는 기능은, 들어온 비밀번호 값과 데이터베이스에서 조회에서 가져온 비밀멎놓 값을
+    // 비교해야함
+    // 무언가를 를 controller 에서 해주기보다 DB에서 값을 가져오는게 우선되므로
+    // 그냥 서비스로 바로 보냄
+    const loginData: LoginInputType = req.body;
+
+    const result = userService.login(loginData);
+};
+
 export default {
     createUser,
+    login,
 };
+
