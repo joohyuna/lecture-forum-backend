@@ -27,6 +27,6 @@ export const validate = (schema: ZodType) => {
 
         // result.success가 true(성공)의 경우가 여이게 실행됨 -> 이 함수를 끝내고 컨트롤로로 진행되어야함
         req.body = result.data;
-        next();
+        next();  // middleware 에서는 다음으로 넘기겠다
     };
 };

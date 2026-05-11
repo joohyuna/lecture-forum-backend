@@ -22,7 +22,7 @@ const createUser = async (data: UserCreateInput) => {
         });
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            // Prisma error 객체 내부에 code 함목 밧이 "P2002"인 것이
+            // Prisma error 객체 내부에 code 함목 값이 "P2002"인 것이
             // 중복값이 있을 때의 에러코드임
             if (error.code === "P2002") {
                 // 중복된 칼럼에 어떤 것인지에 대한 정보는
@@ -55,44 +55,43 @@ const createUser = async (data: UserCreateInput) => {
 };
 
 const login = async (data: LoginInputType) => {
-    try {
-        // prisma.테이블.findUnique() : SELECT 명령 (단, Unique 칼럼을 통해)
-        // findUnique라는  메서드는 객체1개만 리턴
-        // find라는 메서는 Array 가 리턴
+    // prisma.테이블.findUnique() : SELECT 명령 (단, Unique 칼럼을 통해)
+    // findUnique라는  메서드는 객체1개만 리턴
+    // find라는 메서는 Array 가 리턴
 
-        const user = await prisma.user.findUnique({
-            // prisma.c
-            where: {
-                username: data.username,
-            },
-        });
-        // 검색 했는데 해당하는 내용잉 없는것, 에러가 아님
-        // DB에서 조회하 내용인 user가 없거나 deletedAt의 있으면
-        // 탈퇴 되었음을 기록해놓는것이 deletedAt
-        if (!user || user.deletedAt) {
-            throw new Error("INVALID_CREDENTIALS");
-        }
-
-        const isValid = await passwordUtil.verifyPassword(data.password, user.password);
-        if (!isValid) {
-            throw new Error("INVALID_CREDENTIALS");
-        }
-
-        // 아이디와 비밀번호가 일치하는 정보가 있다는 뜻
-        // 로그인 해줘야 함
-        const token = jwtUtil.generateToken(user.id);
-
-        // password와 deletedAt라는 항목은 response(응답)에 포함시킬 필요 없어서, 그걸 제회한 나머지만 safeUserInfo에 저장
-        const { password, deletedAt, ...safeUserInfo } = user;
-        return {
-            user: safeUserInfo,
-            token,
-        }
-
-    } catch (error) {
-
+    const user = await prisma.user.findUnique({
+        // prisma.c
+        where: {
+            username: data.username,
+        },
+    });
+    // 검색 했는데 해당하는 내용이 없는것, 에러가 아님
+    // DB에서 조회하 내용인 user가 없거나 deletedAt의 있으면
+    // 탈퇴 되었음을 기록해놓는것이 deletedAt
+    if (!user || user.deletedAt) {
+        throw new Error("INVALID_CREDENTIALS");
     }
-};
+
+    const isValid = await passwordUtil.verifyPassword(data.password, user.password);
+    if (!isValid) {
+        throw new Error("INVALID_CREDENTIALS");
+    }
+
+    // 아이디와 비밀번호가 일치하는 정보가 있다는 뜻
+    // 로그인 해줘야 함
+    const token = jwtUtil.generateToken(user.id);
+
+    // password와 deletedAt라는 항목은 response(응답)에 포함시킬 필요 없어서, 그걸 제회한 나머지만 safeUserInfo에 저장
+    const { password, deletedAt, ...safeUserInfo } = user;
+    return {
+        user: safeUserInfo,
+        token,
+    };
+
+    // createUser에서는 에러가 나는 부분에 에러 객체가 Prisma Error 객체 였기 때문에 service에서 Javascript Error 겍체로 바꿔즐
+    // 필요가 있엇ㅈ만,
+    // login에서는 필요가 없다.
+}
 
 export default {
     createUser,
