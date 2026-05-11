@@ -91,7 +91,7 @@ const login = async (data: LoginInputType) => {
     // createUser에서는 에러가 나는 부분에 에러 객체가 Prisma Error 객체 였기 때문에 service에서 Javascript Error 겍체로 바꿔즐
     // 필요가 있엇ㅈ만,
     // login에서는 필요가 없다.
-}
+};
 
 export default {
     createUser,
