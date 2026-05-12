@@ -3,6 +3,7 @@ import { z } from "zod";
 import { GenderType } from "../../generated/prisma/enums.ts";
 
 // zod를 통한 검증할 Input값에 대한 객체모양 생성
+// 사용 방법 username z. 들어오는것은 string이어야하고
 export const createUserSchema = z.object({
     username: z.string().min(4),
     password: z.string().min(6),

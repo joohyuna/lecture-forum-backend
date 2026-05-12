@@ -12,7 +12,7 @@ const createUser = async (data: UserCreateInput) => {
         // 프리즈마는 DB와 통신하는 ORM임으로 당연 비동기 함수 => async - await
 
         // create를 생성하면 User 객체가 반환되는데, 그걸 바로 return 시킬거면
-        // await 키워드를 생략함 대신 async는 빼면 안됨
+        // return 바로 할꺼면 await 키워드를 생략함 (이것은 특이점임) 대신 async는 빼면 안됨
         // try catch 를 사용하려면 다시 await
         return await prisma.user.create({
             data,

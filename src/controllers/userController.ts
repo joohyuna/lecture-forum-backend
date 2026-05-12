@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { UserCreateInput } from "../generated/prisma/models/User.ts"; // 안에 있는것을 가져옴
 import userService from "../services/userService.ts";
-import bcrypt from "bcrypt";
 import passwordUtil from "../utils/password/passwordUtil.ts";
 import { LoginInputType } from "../schemas/user/login.ts"; //
 
@@ -9,12 +8,13 @@ const createUser = async (req: Request, res: Response) => {
     try {
         // 프론트엔드가 요청한 정보를 꺼냄
         // 프론트엔드에서 JSON string인데 express통해서 객체화 된것이다.
-
+        // 1. 한번 먼저 꺼내서
         const { username, password, name, nickname, email, phoneNumber, birthdate, gender, role } =
             req.body;
 
         // JSON -> 객체로 바꿀때 가능한것, string, boolean, number, null만 가능함
         // 날짜는 JSON.parse() 해도 string
+        // 2. 다시 타입을 맞춰줘야함
         // userCreateInput 에 이미 prisma가  Type을 만들어 놨음
 
         // bcrypt.hash(암호화할 string, 암호화단계숫자) : 비동기함수, 단방향 암호화 메서드
@@ -74,6 +74,7 @@ const createUser = async (req: Request, res: Response) => {
     }
 };
 
+// login에 대해서 새로운 함수를 만든다
 const login = async (req: Request, res: Response) => {
     try {
         // login 이라는 기능은, 들어온 비밀번호 값과 데이터베이스에서 조회에서 가져온 비밀멎놓 값을
@@ -99,7 +100,7 @@ const login = async (req: Request, res: Response) => {
         }
         console.log(error);
         res.status(500).json({
-            message: "로그닝 처리 중 서버 에러가 발생했습니다. ",
+            message: "로그인 처리 중 서버 에러가 발생했습니다. ",
         });
     }
 };
