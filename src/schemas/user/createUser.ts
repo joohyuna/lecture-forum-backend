@@ -8,10 +8,10 @@ export const createUserSchema = z.object({
     username: z.string().min(4),
     password: z.string().min(6),
     name: z.string().min(2),
-    nickname: z.string().min(2).max(50),
+    nickname: z.string().min(2).max(10),
     email: z.email(), // 자동으로 zod에 형식이 있다 email이라는
     phoneNumber: z.string().optional(),  // 있을수도 있고 없을수도 있다 optional 뜻
-    birthday: z.string().optional(),  //  optional 뜻 프론트앤드세ㅕ 설명
+    birthdate: z.string().optional(),  //  optional 뜻 프론트앤드세ㅕ 설명
     gender: z.enum(GenderType),
 });
 
