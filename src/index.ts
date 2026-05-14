@@ -13,7 +13,7 @@ const PORT = process.env.PORT || "8080";
 
 // 교차 출처 리소스 공유 (CORS)를 허용하는건 백엔드에서 증명하여 허용해야함
 // cors()만 사용하면 모든 프론트엔드 주소에 대해 허용 증명하는것
-// cors({origin: "조소"})를 통해 특정 주소에 대홰서만 허용 증명 할 수 있음
+// cors({origin: "주소"})를 통해 특정 주소에 대홰서만 허용 증명 할 수 있음
 app.use(cors());
 
 // express.json() : 요청(Request)의 본문(body)에서 JSON에 데이터를 객체로 변환 (파싱)하여 request.body에 저장
