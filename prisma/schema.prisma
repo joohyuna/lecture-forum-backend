@@ -14,7 +14,7 @@ datasource db {
   provider = "mysql"
 }
 
-// 이 아렛부분에는 내가 실제 데이터베이스에 사용할 모델명을 기재 -> prisma의 문법을 통해
+// 이 아랫부분에는 내가 실제 데이터베이스에 사용할 모델명을 기재 -> prisma의 문법을 통해
 enum GenderType {
   MALE
   FEMALE
@@ -41,7 +41,7 @@ enum CategoryStatus {
 // 타입이라서 대문자
 model User {
   id          Int        @id @default(autoincrement())
-  createdAt   DateTime   @default(now()) // 삽입할 때 기본값으로 삽잆 시간이 기록
+  createdAt   DateTime   @default(now()) // 삽입할 때 기본값으로 삽입 시간이 기록
   updatedAt   DateTime   @updatedAt // 수정 할때 기본적으로 수정 시간이 기록
   deletedAt   DateTime? // 타입에 ?를 넣으면 null을 허용한다는 뜻
   username    String     @unique

@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import userRouter from "./routes/userRouter.ts";
 import cors from "cors";
+import adminRouter from "./routes/admin/adminRouter.ts";
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 // /user 가 나오면 userRouter로 보내
 // 라우터 빼고 전부 고정 라우팅 여기만 변경된다. 나머지는 그대로 변하지 않음
 app.use("/user", userRouter);
+app.use("/admin", adminRouter);
+
 
 app.listen(PORT, () => {
     console.log(`서버실행! http://localhost:${PORT}`); // 2. 이줄만 있으면  실행가능
