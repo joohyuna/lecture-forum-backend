@@ -52,7 +52,7 @@ const createUser = async (req: Request, res: Response) => {
         if (error instanceof Error) {
             switch (error.message) {
                 case "ALREADY_EXISTS_USERNAME":
-                    res.status(400).json({ message: "이미 사용 중인 아이디입니다." });
+                    res.status(409).json({ message: "이미 사용 중인 아이디입니다." });
                     return;
                 case "ALREADY_EXISTS_EMAIL":
                     res.status(409).json({ message: "이미 사용중인 이메일 입니다." });
@@ -77,7 +77,7 @@ const createUser = async (req: Request, res: Response) => {
 // login에 대해서 새로운 함수를 만든다
 const login = async (req: Request, res: Response) => {
     try {
-        // login 이라는 기능은, 들어온 비밀번호 값과 데이터베이스에서 조회에서 가져온 비밀멎놓 값을
+        // login 이라는 기능은, 들어온 비밀번호 값과 데이터베이스에서 조회에서 가져온 비밀번호 값을
         // 비교해야함
         // 무언가를 를 controller 에서 해주기보다 DB에서 값을 가져오는게 우선되므로
         // 그냥 서비스로 바로 보냄

@@ -25,6 +25,11 @@ enum RoleType {
   USER
 }
 
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
 // model키워드는 Javascript에서는 객체가 되며, DB에서는 테이블이 됨
 // 이안에 기재하는것, [컬럼명] [타입] [옵션] 으로 작성하고
 // 옵션.....
@@ -36,8 +41,8 @@ enum RoleType {
 // 타입이라서 대문자
 model User {
   id          Int        @id @default(autoincrement())
-  createdAt   DateTime   @default(now())  // 삽입할 때 기본값으로 삽잆 시간이 기록
-  updatedAt   DateTime   @updatedAt   // 수정 할때 기본적으로 수정 시간이 기록
+  createdAt   DateTime   @default(now()) // 삽입할 때 기본값으로 삽잆 시간이 기록
+  updatedAt   DateTime   @updatedAt // 수정 할때 기본적으로 수정 시간이 기록
   deletedAt   DateTime? // 타입에 ?를 넣으면 null을 허용한다는 뜻
   username    String     @unique
   password    String
@@ -47,5 +52,13 @@ model User {
   phoneNumber String?
   birthdate   DateTime?
   gender      GenderType
-  role        RoleType   @default(USER)   // 삽입할때 기본값으로 USER 기록
+  role        RoleType   @default(USER) // 삽입할때 기본값으로 USER 기록
+}
+
+model Category {
+  id       Int            @id @default(autoincrement())
+  createAt DateTime       @default(now())
+  updateAt DateTime       @updatedAt
+  name     String
+  status   CategoryStatus @default(ACTIVE)
 }
