@@ -6,4 +6,4 @@ const router= Router();
 
 router.use("/category", adminCategoryRouter);
 
-export default  Router();
+export default router;

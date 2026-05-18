@@ -11,7 +11,7 @@ const getCategoryList = async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "카테고리 목록 조회중 서버 에러가 발생되었습니다." });
+        res.status(500).json({ message: "카테고리 목록 조회 중 서버 에러가 발생되었습니다." });
     }
 };
 
