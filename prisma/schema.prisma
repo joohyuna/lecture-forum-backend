@@ -59,6 +59,6 @@ model Category {
   id       Int            @id @default(autoincrement())
   createAt DateTime       @default(now())
   updateAt DateTime       @updatedAt
-  name     String
+  name     String         @unique
   status   CategoryStatus @default(ACTIVE)
 }
