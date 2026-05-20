@@ -11,6 +11,7 @@ const router = Router();
 // 검증절차 schema를 만들어야한다.
 router.post("/create", validate(adminCreateCategorySchema), adminCategoryController.createCategory);
 router.get("/list", adminCategoryController.getCategoryList);
+router.get("/:id", adminCategoryController.getCategoryById);
 router.patch("/:id/status", adminCategoryController.toggleCategoryStatus);
 router.patch("/:id", validate(adminUpdateCategorySchema), adminCategoryController.updateCategory);
 

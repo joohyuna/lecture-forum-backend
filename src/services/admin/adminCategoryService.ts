@@ -9,11 +9,25 @@ const getCategoryList = () => {
     // findMany(): 데이터 베이스에서 여러개의 row을 SELECT하는 메서드
     // SELECT * FROM category ORDER BY id DESC //내림차순
 
+    // .findMany()의 리턴 타입은 Cagegory[] 그렇기 때문에 검색 결과가 없어도 []반환디ㅚㅁ
     return prisma.category.findMany({
         orderBy: {
             id: "desc",
         },
     });
+};
+
+const getCategoryById = async (id: number) => {
+    // .findUnique()는 유일한 값을 검색하는 명령이기 때문에 값이 없을 수 있음 -> null
+    const category = prisma.category.findUnique({
+        where: {
+            id,
+        }
+    });
+    if (!category) {
+        throw new Error("CATEGORY NOT_FOUND");
+    }
+    return category;
 };
 
 const createCategory = async (input: CategoryCreateInput) => {
@@ -87,6 +101,7 @@ const updateCategory = async (id: number, input: CategoryUpdateInput) => {
 };
 export default {
     getCategoryList,
+    getCategoryById,
     createCategory,
     toggleCategoryStatus,
     updateCategory,
