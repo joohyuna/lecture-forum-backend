@@ -1,5 +1,8 @@
 import prisma from "../../config/prisma.ts";
-import { CategoryCreateInput } from "../../generated/prisma/models/Category.ts";
+import {
+    CategoryCreateInput,
+    CategoryUpdateInput,
+} from "../../generated/prisma/models/Category.ts";
 import { CategoryStatus, Prisma } from "../../generated/prisma/client.ts";
 
 const getCategoryList = () => {
@@ -53,8 +56,38 @@ const toggleCategoryStatus = async (id: number) => {
         },
     });
 };
+
+const updateCategory = async (id: number, input: CategoryUpdateInput) => {
+    try {
+        // 1. 성공 시나리오
+        // return 은 정상 적인것을 던지는 것임
+        return prisma.category.update({
+            where: {
+                id,
+            },
+            data: input,
+        });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            // Prisma의 에러 코드 P2002는 중복값이 있을 때 나오는 에러코드
+            // 2. 실패 시나리오
+            if (error.code === "P2002") {
+                // throw 는 실패를 던지는 것
+                throw new Error("ALREADY_EXIST_CATEGORY_NAME");
+            }
+            // Prisma이 에러코드는 P2025는 업데이 대상을 찾지 못할 때 에러코드
+            // 3. 실패 시나리오
+            if (error.code === "P2025") {
+                throw new Error("CATEGORY_NOT_FOUND");
+            }
+        }
+        // 4. 실패 시나리오
+        throw error;
+    }
+};
 export default {
     getCategoryList,
     createCategory,
     toggleCategoryStatus,
+    updateCategory,
 };
