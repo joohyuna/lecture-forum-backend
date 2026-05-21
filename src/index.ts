@@ -3,6 +3,7 @@ import express from "express";
 import userRouter from "./routes/userRouter.ts";
 import cors from "cors";
 import adminRouter from "./routes/admin/adminRouter.ts";
+import { authenticate, requiredAdmin } from "./middlewares/auth.ts";
 
 dotenv.config();
 
@@ -27,8 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 // 프론트엔드가 요청(Request)에 대하여 경로 Routing 등록
 // /user 가 나오면 userRouter로 보내
 // 라우터 빼고 전부 고정 라우팅 여기만 변경된다. 나머지는 그대로 변하지 않음
-app.use("/admin", adminRouter);
 app.use("/user", userRouter);
+app.use("/admin", authenticate, requiredAdmin, adminRouter);
 
 
 app.listen(PORT, () => {
