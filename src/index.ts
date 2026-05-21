@@ -29,6 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 // /user 가 나오면 userRouter로 보내
 // 라우터 빼고 전부 고정 라우팅 여기만 변경된다. 나머지는 그대로 변하지 않음
 app.use("/user", userRouter);
+// user 인지 검증 user인지 관리자 인지 확인
+// 로그인 하고 authenticate 토근 인증으로 회원확인
+// 그후 requiredAdmin 로 관리자 인지 확인 접근 권한 넣기
 app.use("/admin", authenticate, requiredAdmin, adminRouter);
 
 

@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import jwtUtil from "../utils/jwt/jwtUtil.ts";
-import prisma from "../config/prisma.ts";
 import jwt from "jsonwebtoken";
 import { RoleType, User } from "../generated/prisma/client.ts";
 import userService from "../services/userService.ts";
 
-interface AuthRequest  extends Request {
-    user?: User
+interface AuthRequest extends Request {
+    user?: User;
 }
 
 // middleware로 사용할 녀석의 함수 매개변수는
@@ -49,7 +48,15 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         const decoded = jwtUtil.verifyToken(token); // decoded = { id: ?}
 
         // 4. 그 토큰 안에 있는 내용을 꺼내서, 그 기록된 사용자가 현재 살아있는 사용자인지 확인하고 (DB와의 통신 필요)
-        const user= await userService.getUserById(decoded.id);
+        // 원래 형태
+        // const user = await prisma.user.findUnique({
+        //     where: {
+        //         id: decoded.id,
+        //     },
+        // });
+        // DB와 통신을 하는 것은 전부 Service에 저장되어 있어서  prisma기능을 서비스로 옮겼음
+        // userService 안에 함수 getUserById로 저장 불러와서 사용
+        const user = await userService.getUserById(decoded.id);
 
         if (!user || user.deletedAt) {
             res.status(401).json({ message: "유효하지 않은 사용자이거나 탈퇴한 계정입니다." });
@@ -75,7 +82,6 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 };
 
-
 export const requiredAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
     // 그렇게 확인해온 user 정보 중, user.role ===  "ADMIN" 인가만 판별하는 기능만 탑재
     // 이것 구현하기 위해서 user 정보를 꺼내야 되는데, 지금 당장은 가져올 곳이 없음
@@ -86,7 +92,7 @@ export const requiredAdmin = (req: AuthRequest, res: Response, next: NextFunctio
     // 그럼, authenticate를 할 때, 사용자 정보(user)를 req에 넣자
 
     if (!req.user) {
-        res.status(401).json({message: "인증 정보가 없습니다. 먼저 로그인 해주세요"});
+        res.status(401).json({ message: "인증 정보가 없습니다. 먼저 로그인 해주세요" });
         return;
     }
     if (req.user.role !== RoleType.ADMIN) {
@@ -94,4 +100,4 @@ export const requiredAdmin = (req: AuthRequest, res: Response, next: NextFunctio
         return;
     }
     next();
-}
+};

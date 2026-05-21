@@ -54,7 +54,8 @@ const createUser = async (data: UserCreateInput) => {
     }
 };
 
-export const getUserById = async (id: number) => {
+// Prisma를 사용해서 토큰 안의 내용을 사용자와  DB와의 통신으로 확인
+const getUserById = async (id: number) => {
     const user = await prisma.user.findUnique({
         where: {
             id,
@@ -101,7 +102,7 @@ const login = async (data: LoginInputType) => {
     };
 
     // createUser에서는 에러가 나는 부분에 에러 객체가 Prisma Error 객체 였기 때문에 service에서 Javascript Error 겍체로 바꿔즐
-    // 필요가 있엇ㅈ만,
+    // 필요가 있었지만
     // login에서는 필요가 없다.
 };
 
