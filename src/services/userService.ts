@@ -54,6 +54,18 @@ const createUser = async (data: UserCreateInput) => {
     }
 };
 
+export const getUserById = async (id: number) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id,
+        },
+    })
+    if (!user) {
+        throw new Error("USER_NOT_FOUND");
+    }
+    return user;
+}
+
 const login = async (data: LoginInputType) => {
     // prisma.테이블.findUnique() : SELECT 명령 (단, Unique 칼럼을 통해)
     // findUnique라는  메서드는 객체1개만 리턴
@@ -95,5 +107,6 @@ const login = async (data: LoginInputType) => {
 
 export default {
     createUser,
+    getUserById,
     login,
 };

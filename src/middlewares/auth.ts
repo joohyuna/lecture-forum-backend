@@ -3,6 +3,7 @@ import jwtUtil from "../utils/jwt/jwtUtil.ts";
 import prisma from "../config/prisma.ts";
 import jwt from "jsonwebtoken";
 import { RoleType, User } from "../generated/prisma/client.ts";
+import userService from "../services/userService.ts";
 
 interface AuthRequest  extends Request {
     user?: User
@@ -48,11 +49,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         const decoded = jwtUtil.verifyToken(token); // decoded = { id: ?}
 
         // 4. 그 토큰 안에 있는 내용을 꺼내서, 그 기록된 사용자가 현재 살아있는 사용자인지 확인하고 (DB와의 통신 필요)
-        const user = await prisma.user.findUnique({
-            where: {
-                id: decoded.id,
-            },
-        });
+        const user= await userService.getUserById(decoded.id);
 
         if (!user || user.deletedAt) {
             res.status(401).json({ message: "유효하지 않은 사용자이거나 탈퇴한 계정입니다." });
@@ -64,7 +61,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         next();
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
-            res.status(401).json({ message: "토근이 만로 되었습니다. 다시 로그인 해주세요" });
+            res.status(401).json({ message: "토근이 만료 되었습니다. 다시 로그인 해주세요" });
             return;
         }
         if (error instanceof jwt.JsonWebTokenError) {
