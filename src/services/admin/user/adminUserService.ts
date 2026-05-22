@@ -59,7 +59,7 @@ const updateUser = async (input: UserUpdateInput, id: number) => {
     const user = await prisma.user.findUnique({
         where: {
             id,
-        }
+        },
     });
     if (!user) {
         throw new Error("USER_NOT_FOUND");
@@ -70,8 +70,7 @@ const updateUser = async (input: UserUpdateInput, id: number) => {
                 id,
             },
             data: input,
-        })
-
+        });
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2002") {
@@ -89,11 +88,41 @@ const updateUser = async (input: UserUpdateInput, id: number) => {
         }
         throw new Error("UNKNOWN_ERROR");
     }
-}
+};
+
+const toggleUser = async (id: number) => {
+    // 실제 데이터베이스에 DELETE로 요청하는게 아닌,
+    // UPDATE로 deletedAt만 날짜를 기록할 것임 (소프트 삭제)
+    const user = await prisma.user.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    // 3.
+    if (!user) {
+        throw new Error("USER_NOT_FOUND");
+    }
+
+    // 2.
+    if (user.deletedAt) {
+        throw new Error("USER_ALREADY_DELETED");
+    }
+
+    // 1.
+    return prisma.user.update({
+        where: {
+            id,
+        }, data: {
+            deletedAt: new Date(),
+        }
+    })
+};
 
 export default {
     getUserList,
     getUserById,
     createUser,
-    updateUser
+    updateUser,
+    toggleUser,
 };

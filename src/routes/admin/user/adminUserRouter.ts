@@ -1,3 +1,4 @@
+// adminUserRouter
 import { Router } from "express";
 import adminUserController from "../../../controllers/admin/user/adminUserController.ts";
 import { validate } from "../../../middlewares/validate.ts";
@@ -15,6 +16,6 @@ router.patch("/:id", validate(adminUpdateUserSchema), adminUserController.update
 // 유저 한명 조회
 router.get("/:id", adminUserController.getUserById);
 // 유저 소프트 삭제 (토글)
-router.patch("/:id/delete", () => {});
+router.patch("/:id/delete", adminUserController.toggleUser);
 
 export default router;

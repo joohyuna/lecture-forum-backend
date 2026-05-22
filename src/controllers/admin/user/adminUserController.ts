@@ -1,3 +1,4 @@
+// adminUserController.ts
 import { Request, Response } from "express";
 import adminUserService from "../../../services/admin/user/adminUserService.ts";
 import passwordUtil from "../../../utils/password/passwordUtil.ts";
@@ -148,9 +149,41 @@ const updateUser = async (req: Request<{ id: string }>, res: Response) => {
     }
 };
 
+// type 옆에 <>를 붙여서 하는건 "Generic Type"이라고 함
+const toggleUser = async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        // req.params.id  즉, 그 값을 꺼내온 id 라고 하는 변수는 주소값에서 긁어왔으니 string
+        // 판별 해줘야 함
+        if (isNaN(id)) {
+            res.status(400).json({ message: "유효하지 않은 사용자 ID 입니다." });
+            return;
+        }
+        const deleteUser = await adminUserService.toggleUser(id);
+        res.status(200).json({
+            message: "유저가 성공적으로 삭제되었습니다.",
+            data: deleteUser,
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message === "USER_NOT_FOUND") {
+                res.status(404).json({ message: "유저를 찾을 수 없습니다." });
+                return;
+            }
+            if (error.message === "ALREADY_DELETED") {
+                res.status(400).json({ message: "이미 삭제된 유저입니다." });
+                return;
+            }
+        }
+        // 4.
+        res.status(500).json({ message: "서버 에러가 발생했습니다." });
+    }
+};
+
 export default {
     getUserList,
     getUserById,
     createUser,
     updateUser,
+    toggleUser,
 };

@@ -17,6 +17,7 @@ interface AuthRequest extends Request {
 
 // 원래 req 자리에 들어와야 되는 인터페이스는 Request이므로,
 // Request를 상속 받은 AuthRequest가 그 자리에 들어갈 수 있음
+// 비회원인지 아닌지에 대한 내용
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         // 1. 들어온 Request에서 헤더의 내용을 꺼내, 그 중 Authorization 의 값이 있는지 확인
@@ -36,7 +37,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         // : "Bearer 뭐뭐" 를 split(" ")로 나눈 결과 값은 ["Bearer", "뭐뭐"]리턴
         const token = authHeader.split(" ")[1];
 
-        // 들어온 값이 "Bearer "일 수 있음
+        // 들어온 값이 "Bearer "일 수 있음 (Bearer 반드시 한칸 띄기)
         if (!token) {
             res.status(401).json({
                 message: "토큰이 비어 있거나 형식이 올바르지 않습니다.",
@@ -45,6 +46,9 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         }
 
         // 3. 모모가 내가 발급한 토근이 맞는지 검증
+        //      1) 토큰이 내가 발급한게 아님
+        //      2) 내가 발급한건 맞지만, 만료됐네
+        // 4번으로 진행
         const decoded = jwtUtil.verifyToken(token); // decoded = { id: ?}
 
         // 4. 그 토큰 안에 있는 내용을 꺼내서, 그 기록된 사용자가 현재 살아있는 사용자인지 확인하고 (DB와의 통신 필요)
@@ -58,6 +62,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         // userService 안에 함수 getUserById로 저장 불러와서 사용
         const user = await userService.getUserById(decoded.id);
 
+        // 또 에러
         if (!user || user.deletedAt) {
             res.status(401).json({ message: "유효하지 않은 사용자이거나 탈퇴한 계정입니다." });
             return;
