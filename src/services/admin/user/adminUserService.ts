@@ -3,12 +3,29 @@ import { UserCreateInput, UserUpdateInput } from "../../../generated/prisma/mode
 import { Prisma } from "../../../generated/prisma/client.ts";
 
 // 유저 목록 API
-const getUserList = async () => {
-    return prisma.user.findMany({
+const getUserList = async (page: number, size: number) => {
+    // prisma에게 페이지네이션을 한 정보를 요청을 하기 위해서는
+    // skip, take라는 정보가 필요함, skip은 지나쳐댜되는 항목 객수 take는 가져와야 되는 항목 갯수
+    const skip = (page - 1) * size;
+    const take = size;
+
+    // SELECT COUNT(*) FROM user;
+    const total = await prisma.user.count();
+
+    const list = await prisma.user.findMany({
         orderBy: {
             id: "desc",
         },
+        take,
+        skip,
     });
+
+    return {
+        page,
+        size,
+        total,
+        list,
+    }
 };
 
 // 한개의 유저 API
