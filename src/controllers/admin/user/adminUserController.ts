@@ -11,8 +11,8 @@ const getUserList = async (req: Request, res: Response) => {
 
     try {
         // 쿼리 스트링은 있을 수도 있고 없을 수도 있음 , 그리고 형변환도 안될 수 있음
-        const page = Number(req.params.page) || 1;
-        const size = Number(req.params.size) || 20;
+        const page = Number(req.query.page) || 1;
+        const size = Number(req.query.size) || 20;
 
         const users = await adminUserService.getUserList(page, size);
         res.status(200).json({ message: "유저 목록을 성공적으로 불러왔습니다.", data: users });
