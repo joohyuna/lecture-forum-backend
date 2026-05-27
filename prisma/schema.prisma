@@ -12,6 +12,7 @@ generator client {
 // 번역에 대한 사전을 만드는 것임
 datasource db {
   provider = "mysql"
+  relationMode = "prisma"
 }
 
 // 이 아랫부분에는 내가 실제 데이터베이스에 사용할 모델명을 기재 -> prisma의 문법을 통해
@@ -53,6 +54,10 @@ model User {
   birthdate   DateTime?
   gender      GenderType
   role        RoleType   @default(USER) // 삽입할때 기본값으로 USER 기록
+
+  // 관계를 맺는다
+  // User(1) : Post(N)
+  posts Post[]
 }
 
 model Category {
@@ -61,4 +66,32 @@ model Category {
   updateAt DateTime       @updatedAt
   name     String         @unique
   status   CategoryStatus @default(ACTIVE)
+
+  posts Post[]
+}
+
+// Post 테이블과 다른 테이블의 연관성을 생각 해봐야 함
+// 해당 데이터를 삭제해도 될 때에는, 1. 자식 테이블이 없을 때 (연관성이 아예 존재치 않을 때)
+// 2. 자식 테이블까지 고려했을 때에도 중요하지 않을 때
+// 3. Post의 경우 Replies나, Like등 테이블과 연관성이 있다고 판단하더라도
+// 삭제해도 괜찮은 데이터들임 => 소프트삭제를 하든, 진짜 삭제 처리를 하든, 문제는 없을 것이다라고 가정
+// 1번이든 2번이든 진행하는것 내 말이다.
+// Prisma에서는 부모 데이터가 삭제되면, 자식 데이터까지 모두 삭제하는 기능을 제공
+model Post {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  title     String // varchar(255)
+  content   String    @db.Text // Javascript에서는 String으로 동작하지만, DB 칼럼은  Text 로 만들어 달라
+  views     Int       @default(0) // 조회수
+
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])  // userId 사용자의 정보를 담아 줄것 알아서 한다
+  // realtio을 맺는데, 이 글을 작성한 부모의 id값이 적혀지는 칼럼은 userId이고, 그 값으로 부모 테이블의 대상 칼럼은 id이다.
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@index([userId])
+  @@index([categoryId])
 }

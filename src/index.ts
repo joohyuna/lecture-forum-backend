@@ -4,6 +4,7 @@ import userRouter from "./routes/userRouter.ts";
 import cors from "cors";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import categoryRouter from "./routes/categoryRouter.ts";
+import postRouter from "./routes/postRouter.ts";
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: true })); // 얘도 미들웨어
 app.use("/user", userRouter);
 
 app.use("/category", categoryRouter);
+app.use("/post", postRouter);
 
 // user 인지 검증 user인지 관리자 인지 확인
 // 로그인 하고 authenticate 토근 인증으로 회원확인
