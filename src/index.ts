@@ -3,7 +3,7 @@ import express from "express";
 import userRouter from "./routes/userRouter.ts";
 import cors from "cors";
 import adminRouter from "./routes/admin/adminRouter.ts";
-import { authenticate, requiredAdmin } from "./middlewares/auth.ts";
+import categoryRouter from "./routes/categoryRouter.ts";
 
 dotenv.config();
 
@@ -37,6 +37,8 @@ app.use(express.urlencoded({ extended: true })); // 얘도 미들웨어
 // /user 가 나오면 userRouter로 보내
 // 라우터 빼고 전부 고정 라우팅 여기만 변경된다. 나머지는 그대로 변하지 않음
 app.use("/user", userRouter);
+
+app.use("/category", categoryRouter);
 
 // user 인지 검증 user인지 관리자 인지 확인
 // 로그인 하고 authenticate 토근 인증으로 회원확인

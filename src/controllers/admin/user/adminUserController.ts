@@ -14,7 +14,10 @@ const getUserList = async (req: Request, res: Response) => {
         const size = Number(req.query.size) || 20;
 
         const users = await adminUserService.getUserList(page, size);
-        res.status(200).json({ message: "유저 목록을 성공적으로 불러왔습니다.", data: users });
+        res.status(200).json({
+            message: "유저 목록을 성공적으로 불러왔습니다.",
+            data: users,
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "유저 목록을 불러오는 중 오류가 발생했습니다." });
