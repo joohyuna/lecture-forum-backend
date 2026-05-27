@@ -7,7 +7,7 @@ export const adminUpdateUserSchema = z.object({
     name: z.string().min(2),
     nickname: z.string().min(2).max(10),
     email: z.email(),
-    phoneNumber: z.string().min(5).optional(),
+    phoneNumber: z.string().optional(),
     birthdate: z.string().optional(),
     gender: z.enum(GenderType),
 

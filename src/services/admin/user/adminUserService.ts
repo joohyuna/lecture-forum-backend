@@ -48,7 +48,7 @@ const getUserById = async (id: number) => {
 
 const createUser = async (input: UserCreateInput) => {
     try {
-        return prisma.user.create({
+        return await prisma.user.create({
             data: input,
         });
     } catch (error) {

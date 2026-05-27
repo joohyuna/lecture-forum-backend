@@ -8,7 +8,6 @@ import { AdminUpdateUserInputType } from "../../../schemas/admin/user/updateUser
 
 // 유저 목록 API
 const getUserList = async (req: Request, res: Response) => {
-
     try {
         // 쿼리 스트링은 있을 수도 있고 없을 수도 있음 , 그리고 형변환도 안될 수 있음
         const page = Number(req.query.page) || 1;
@@ -103,34 +102,36 @@ const updateUser = async (req: Request<{ id: string }>, res: Response) => {
             res.status(400).json({
                 message: "유효하지 않은 사용자의 ID입니다.",
             });
-            const { password, birthdate, phoneNumber, ...restData }: AdminUpdateUserInputType =
-                req.body;
-
-            // 데이터베이스에서 생성할 때 집어넣을 내용으로 변환
-            // prisma가 데이터베이스에서 insert 할때 필요한 타입을 미리 마련해줬다.
-            const newUser: UserUpdateInput = {
-                ...restData,
-            };
-
-            // 업데이트할 데이터를 null을 집어 넣어버리면
-            // prisma (DB)는 그칼럼의 값을 null로 바꿔 버림 즉 있던 값도 삭제해 버림
-            if (password) {
-                newUser.password = await passwordUtil.hashPassword(password);
-            }
-            if (phoneNumber) {
-                newUser.phoneNumber = phoneNumber;
-            }
-            if (birthdate) {
-                newUser.birthdate = new Date(birthdate);
-            }
-
-            const result = await adminUserService.updateUser(newUser, id);
-
-            res.status(200).json({
-                message: "유저를 성공적으로 생성했습니다.",
-                data: result,
-            });
+            return;
         }
+
+        const { password, birthdate, phoneNumber, ...restData }: AdminUpdateUserInputType =
+            req.body;
+
+        // 데이터베이스에서 생성할 때 집어넣을 내용으로 변환
+        // prisma가 데이터베이스에서 insert 할때 필요한 타입을 미리 마련해줬다.
+        const newUser: UserUpdateInput = {
+            ...restData,
+        };
+
+        // 업데이트할 데이터를 null을 집어 넣어버리면
+        // prisma (DB)는 그칼럼의 값을 null로 바꿔 버림 즉 있던 값도 삭제해 버림
+        if (password) {
+            newUser.password = await passwordUtil.hashPassword(password);
+        }
+        if (phoneNumber) {
+            newUser.phoneNumber = phoneNumber;
+        }
+        if (birthdate) {
+            newUser.birthdate = new Date(birthdate);
+        }
+
+        const result = await adminUserService.updateUser(newUser, id);
+
+        res.status(200).json({
+            message: "유저를 성공적으로 생성했습니다.",
+            data: result,
+        });
     } catch (error) {
         if (error instanceof Error) {
             switch (error.message) {
