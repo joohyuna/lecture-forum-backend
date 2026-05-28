@@ -41,6 +41,7 @@ const getPostsByCategory = async (categoryId: number, page: number, size: number
 };
 
 const createPost = async (postData: PostCreateInput) => {
+    // INSERT 쿼리 전송
     await prisma.post.create({
     data: postData,
     })
