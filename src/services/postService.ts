@@ -4,7 +4,7 @@ const getPostsByCategory = async (categoryId: number, page: number, size: number
     const skip = (page - 1) * size;
 
     // SELECT * FROM post WHERE categoryId = categoryId AND deleteAt = Null By id DESC
-    const list = prisma.post.findMany({
+    const list = await prisma.post.findMany({
         where: {
             categoryId,
             deletedAt: null,

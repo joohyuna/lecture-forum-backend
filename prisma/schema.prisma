@@ -11,7 +11,7 @@ generator client {
 // prisma를 통해 사용할 DB source 종류를 기록
 // 번역에 대한 사전을 만드는 것임
 datasource db {
-  provider = "mysql"
+  provider     = "mysql"
   relationMode = "prisma"
 }
 
@@ -58,6 +58,7 @@ model User {
   // 관계를 맺는다
   // User(1) : Post(N)
   posts Post[]
+  votes Vote[]
 }
 
 model Category {
@@ -78,20 +79,55 @@ model Category {
 // 1번이든 2번이든 진행하는것 내 말이다.
 // Prisma에서는 부모 데이터가 삭제되면, 자식 데이터까지 모두 삭제하는 기능을 제공
 model Post {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  title     String // varchar(255)
-  content   String    @db.Text // Javascript에서는 String으로 동작하지만, DB 칼럼은  Text 로 만들어 달라
-  views     Int       @default(0) // 조회수
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  title       String // varchar(255)
+  content     String    @db.Text // Javascript에서는 String으로 동작하지만, DB 칼럼은  Text 로 만들어 달라
+  views       Int       @default(0) // 조회수
+  option1Text String?
+  option2Text String?
 
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])  // userId 사용자의 정보를 담아 줄것 알아서 한다
+  user       User     @relation(fields: [userId], references: [id]) // userId 사용자의 정보를 담아 줄것 알아서 한다
   // realtio을 맺는데, 이 글을 작성한 부모의 id값이 적혀지는 칼럼은 userId이고, 그 값으로 부모 테이블의 대상 칼럼은 id이다.
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
+  votes Vote[]
+
   @@index([userId])
   @@index([categoryId])
+}
+
+model Vote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  option    Int // 몇번에 투표
+  // Post의 자식, User 자식
+  userId    Int // 유저를 찬들수 있도록하는 id 값이 "실제 기록"되는 칼럼
+  user      User     @relation(fields: [userId], references: [id])
+  postId    Int // 부모 글을 찾을수 있도록하는 id값이 "실제 기록되는 칼럼"
+  post      Post     @relation(fields: [postId], references: [id])
+
+  // 데이터베이스는 데이터에 대한 저장을 담당하고, 그 데이터를 검색을 주는 장치
+  // 빠르게 검색을 도와주는 도구로서  index라는 게 존재함
+
+  // 모든 칼럼에 대애 색인을 만들 필요은 없음, 전화번호에 "ㄱ,ㄴ, ㄷ"로 만들지 , "김, 이, 최"로 만들진 않음
+  // 오히려 색인이 많아지면 데이터베이스가 해야 할 일이 많아짐
+  // 데이텨베이스는 기본적으로 검색할 때 id(primary key)와 unique를 걸어준 것에 대해 색인을 만듦
+
+  // 나중에 마이페이지를 만들 때 "내가 투표한 거"를 찾아달라고 이야기 할 것이고
+  // 게시글 상세페이지에서 postId를 기준으로 검색을 해야
+  // 사실, Pk든, Fk든 key는 당연해 필요함
+
+  // 투표라고 하는건, 1인 1투표를 기초로 함
+  // userId에 unique를 걸면 그 사람은 진짜1인 1투표
+  // postId에 unique를 걸면 그포스트에만 1인 1투표
+  // 그러니깐 unique는 userId와 postId를 같이 걸어준다.
+  @@unique([userId, postId])
+  @@index([postId]) // foreign key
+  @@index([userId]) // foreign key
 }

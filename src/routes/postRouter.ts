@@ -3,6 +3,6 @@ import postController from "../controllers/postController.ts";
 
 const router = Router();
 
-router.get("/list/:category", postController.getPostsByCategory);
+router.get("/list/:categoryId", postController.getPostsByCategory);
 
 export default router;
