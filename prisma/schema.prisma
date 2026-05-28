@@ -95,8 +95,10 @@ model Post {
   @@index([categoryId])
 }
 
+// Post에 대한 자식 테이블 임 Post가 없다면
+// 투표에 대한것
 model Vote {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())  // Pk 자동으로 unique가 걸려 있음
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   option    Int // 몇 번에 투표했는지
