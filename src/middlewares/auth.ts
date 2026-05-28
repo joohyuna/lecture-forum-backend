@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { RoleType, User } from "../generated/prisma/client.ts";
 import userService from "../services/userService.ts";
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
     user?: User;
 }
 
