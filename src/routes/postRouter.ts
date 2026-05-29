@@ -7,6 +7,7 @@ import { authenticate } from "../middlewares/auth.ts";
 const router = Router();
 
 router.get("/list/:categoryId", postController.getPostsByCategory);
+router.get("/:id", postController.getPostById);
 router.post("/create", authenticate, validate(createPostSchema), postController.createPost);
 
 export default router;

@@ -12,7 +12,6 @@ const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Res
         const size = Number(req.query.size) || 20;
 
         if (isNaN(categoryId)) {
-
             res.status(400).json({
                 message: "유효하지 않은 카테고리 ID입니다.",
             });
@@ -32,6 +31,29 @@ const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Res
     }
 };
 
+const getPostById = async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const postId = Number(req.params.id);
+        if (isNaN(postId)) {
+            res.status(400).json({
+                message: "유효하지 않은 게시글 ID입니다.",
+            });
+            return;
+        }
+        const post = await postService.getPostById(postId);
+
+        res.status(200).json({
+            message: "게시글을 성공적을 불러왔습니다.",
+            data: post,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "서버 에러가 발생했습니다.",
+        });
+    }
+};
+
 const createPost = async (req: AuthRequest, res: Response) => {
     // req.body에 들어온 값들을 꺼내서, 서비비스로 보내주야함
     // 즉 req.body로 들어온 내용을 토애고 데이터베이스에 쓸수 있는 타입 객체로 바꾸서 보내야함
@@ -47,7 +69,7 @@ const createPost = async (req: AuthRequest, res: Response) => {
         const user = req.user;
         if (!user) {
             return res.status(401).json({
-                message: "로그인이 필요한 서비스입니다."
+                message: "로그인이 필요한 서비스입니다.",
             });
         }
 
@@ -69,16 +91,17 @@ const createPost = async (req: AuthRequest, res: Response) => {
         res.status(201).json({
             message: "게시글이 성공적으로 작성되었습니다.",
             data: newPost,
-        })
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            message: "게시글 작성 중 서버 에러가 발생되었습니다."
-        })
+            message: "게시글 작성 중 서버 에러가 발생되었습니다.",
+        });
     }
 };
 
 export default {
     getPostsByCategory,
     createPost,
+    getPostById,
 };

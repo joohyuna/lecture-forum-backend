@@ -82,20 +82,21 @@ model Post {
   title       String
   content     String    @db.Text
   views       Int       @default(0)
-  option1Text String?
+  option1Text String? // 값이 없을 수 있다 => null
   option2Text String?
 
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
+  // 이렇게 쓰는 것은 부모쪽 임 부모쪽에서는 가상 칼럼, 단지 우리가 조회를 할때 3번글이 거기에 해당하는 글이 있는지 Join을 해온다
   votes      Vote[]
 
   @@index([userId])
   @@index([categoryId])
 }
 
-// Post에 대한 자식 테이블 임 Post가 없다면
+// User와 Post에 대한 자식 테이블 임 Post가 없다면
 // 투표에 대한것
 model Vote {
   id        Int      @id @default(autoincrement())  // Pk 자동으로 unique가 걸려 있음
@@ -105,7 +106,9 @@ model Vote {
   // Post에 자식, User에 자식
   userId    Int // 부모 유저를 찾을 수 있도록 하는 id값이 "실제 기록"되는 칼럼
   user      User     @relation(fields: [userId], references: [id])
-  postId    Int // 부모 글을 찾을 수 있도록 하는 id값이 "실제 기록"되는 칼럼
+  // 부모 글을 찾을 수 있도록 하는 id값이 "실제 기록"되는 칼럼
+  postId    Int
+  // 실제 내용이 포스트 칼럼에 들어온다. 데이터베이스존재 없는 가상 칼럼으로 존재한다.
   post      Post     @relation(fields: [postId], references: [id])
 
   // 데이터베이스는 데이터에 대한 저장을 담당하고, 그 데이터를 검색해 주는 장치
