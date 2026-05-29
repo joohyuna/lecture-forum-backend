@@ -31,7 +31,17 @@ const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Res
     }
 };
 
-const getPostById = async (req: Request<{ id: string }>, res: Response) => {
+const getPostById = async (req: AuthRequest<{ id: string }>, res: Response) => {
+    // 원래, 글 내용 조회라는 기능엔 "조회하는 사람이 누군가"는 중요하지 않았음
+    // 근데 "죄회하는 사람이" 투표를 했나 안했나를 알기 위해서는 "그 사람"이 누군가를 알아야함
+
+    // 글의 내용을 요청하는 사람에 대한 정보를 알기 위해서는 어디에 접근해야 하는가?
+    // 지금 접속한 사람에 대한 정보는
+    // 프론트엔드만 저장하고 있음   => Zustand에서 찾을 수 있음 (저장하고 있으니까)
+    // 백엔드는 저장하고 있지 않음  => 메모리에서 찾을 수 없음
+    // 그렇기 때문에 매 번 프론트엔드가 신분증 정보를 요처(Request)의 헤더(headers)에 첨부해서 보내기 때문에
+    // 매 요청 때마다 HTTP 메세지(Request)를 까서 헤더에 접근해서 헤더에서
+    // 토큰을 가져와 사용자정보를 확인함
     try {
         const postId = Number(req.params.id);
         if (isNaN(postId)) {
@@ -40,7 +50,8 @@ const getPostById = async (req: Request<{ id: string }>, res: Response) => {
             });
             return;
         }
-        const post = await postService.getPostById(postId);
+        const userId = req.user?.id;
+        const post = await postService.getPostById(postId, userId);
 
         res.status(200).json({
             message: "게시글을 성공적을 불러왔습니다.",

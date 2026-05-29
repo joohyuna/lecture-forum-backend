@@ -3,8 +3,24 @@ import jwtUtil from "../utils/jwt/jwtUtil.ts";
 import jwt from "jsonwebtoken";
 import { RoleType, User } from "../generated/prisma/client.ts";
 import userService from "../services/userService.ts";
+import * as core from "express-serve-static-core";
 
-export interface AuthRequest extends Request {
+// 이렇게 Express의 기본 인터페이스인 Request를 상속받아
+// user라고 하는 항목을 덧붙인  AuthRequest를 만들었는데
+// Request라는 Express기본 타입은 Generic Type임
+// 그렇기 때문에 우리가 Request 타입을 쓸때 Request<{id: string}>라고
+// 쓰는게 가능했었음
+// 이렇게 제네릭을 통해 Request에 제공되는 {id: string}은
+// req.params (동적 라우팅) 을 통해 경로에 추가로 들어오는 값을 나타내줬던 것
+
+// 우리가 만든 AuthRequest는 상속을 받았지만, 제네릭은 아님
+export interface AuthRequest<
+    P = core.ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = core.Query,
+    Locals extends Record<string, any> = Record<string, any>,
+> extends Request<P, ResBody, ReqBody, ReqQuery, Locals> {
     user?: User;
 }
 
@@ -84,6 +100,37 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
         }
         console.error(error);
         res.status(500).json({ message: "인증 처리 중 서버 에러가 발생했습니다." });
+    }
+};
+
+export const checkUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    // 탈락시키는 일은 안함
+    // 로그인 정보(토큰)이 헤더에 있으면 req.user에 정보를 담는 역할
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            // 헤더를 봤더니 내용이 없어? 그럼 그냥 컨트롤러로 가
+            return next();
+        }
+        const token = authHeader.split(" ")[1];
+        if (!token) {
+            // 헤더에 Authorization 항목이 있는데 "Bearer <토큰이>" 이형식이 아니야 그럼 그냥 컨트롤러로 가
+            return next();
+        }
+        const decoded = jwtUtil.verifyToken(token); // decoded = { id: ?}
+
+        const user = await userService.getUserById(decoded.id);
+
+        if (!user || user.deletedAt) {
+            // 가지고 온 토튼일 검증하고 사용자 정보를 확인했는데 없어? 그럼 그냥 컨트롤러로 가
+            return next();
+        }
+        req.user = user;
+
+        next();
+    } catch (error) {
+        // 뭔가위에서 에러가 발생했어? 그럼 그냥 컨트롤러로 가
+        next();
     }
 };
 
