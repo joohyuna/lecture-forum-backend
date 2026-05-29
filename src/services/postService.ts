@@ -104,7 +104,7 @@ const getPostById = async (postId: number, userId?: number) => {
             option2count,
             totalCount: option1Count + option2count,
             hasVoted,
-        }
+        },
     };
 };
 
