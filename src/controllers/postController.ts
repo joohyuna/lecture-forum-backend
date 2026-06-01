@@ -162,7 +162,7 @@ export const votePost = async (req: AuthRequest<{ postId: string }>, res: Respon
     } catch (error) {
         if (error instanceof Error) {
             if (error.name === "NOT_FOUND") {
-                res.status(400).json({ message: "존재하지 않거나 삭제된 게시물입니다." });
+                res.status(404).json({ message: "존재하지 않거나 삭제된 게시물입니다." });
                 return;
             }
             if (error.message === "NOT_FOUND") {
@@ -172,7 +172,7 @@ export const votePost = async (req: AuthRequest<{ postId: string }>, res: Respon
                 return;
             }
             if (error.message === "ALREADY_VOTED") {
-                res.status(400).json({ message: "이미 투표에 참여하셨습니다." });
+                res.status(409).json({ message: "이미 투표에 참여하셨습니다." });
                 return;
             }
         }
