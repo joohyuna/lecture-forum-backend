@@ -84,8 +84,44 @@ const getPostById = async (postId: number, userId?: number) => {
     });
 
     // 지금 요청을 한 이 사람이 이글에 대해 투표를 했는지 안 했는지
-    let hasVoted = false;
+    // 변수를 선언할 때 사용할 수 있는 키워드
+    // var  => x   : 사용하지 말아야 할 이유 (내가 쓰기 전에: 즉, 그 안에 무언가 값을 저장하기 전 : 도 변수에 접근할 수 있기 때문)
+    // 개발자가 통제하기 전에 접근이 가능하도록 열려있어서 사용하지 말라고
+    // let
+    // const => 이것로만 선언
+    // let / const
+    // let은 값을 변경할 수 있는 변수를 만드는 키워드 => let으로 값을 저장해도, 지속적으로 값을 변경할 수 있음
+    // let a;
+    // a = 10;
+    // const는 값을 변경할 수 없는 변수를 만드는 키워드 => const는 선언할 때 넣은 값을 바꿀 수 없음
+    // const a;  (a의 값을 변경 할 수 없게 잠김 => 사용 할 수 없는 상태라 이렇게 할 수 없음)
+    // const a = 10; 할당이 동시에 이뤄져야함 함
+
+    // 근데 왜 대부분 const를 쓰게 되지?
+    // 우리가 거의 대부분의 변수에는 원시타입을 집어넣기볻, array 또는 Object를 넣기 때문
+    // array 또는 Object는 메모리 상 값이 "우리가 생각하는 값"이 저장되니 않고, 주소값이 저장됨 <= 얘만 못 바꾼다는 뜻
+    // [1, 2, 3, 4, 5]  => 1, 2, 3, 4, 5라는 값이 저장되는 공간 // 주소값이 저장되는 공간
+    // const a = true;
+    // a = false; (X)
+    // const b = [];
+    // b.push(3);  (O)  => 원래의 array에, 연결된 공간에 3값을 쓰기 때문에 가능
+    // b = { id: 3 }; (X) => 새로운 객체의 주소값을 b에 넣으려고 하기 때문에 안됨
+    // b = [8]  (X) => 새로운 array의 주소값을 b에 넣으려고 하기 때문에 안됨
+
+    // 프로그램을 할 때 기본적으로 const를 사용하는거소, 그리고 값이 변경된다고 판단될 때 let으로 변경
+
+    // var는 중복선언가능
+    // let/const 중복선언 불가능
+
+    // var와 let/const는 스코프 차이가 있음
+    // var는 구분짓는 스코프가 함수 스코프에 대해서만 영얗을 받음
+    // let/const는 함수 스코프 뿐만 아니라 블록 스코프에 대해서도 영향을 받음
+
+    // 지금 요청을 한 이 사람이 이 글에 대해 투표를 했는지 안 했는지
+    // 자식들은 부모의 것을 선택할수 있어서 안에서 사용하려면
+    let hasVoted = false; // 나중에 보니 값을 바꿀수 있어야 해서 let 필요해서 의해서 기본적으로 const 사용
     if (userId) {
+        // findFirst는 조건에 맞는 첫 번째 데이터를 찾음
         const myVote = await prisma.vote.findFirst({
             where: {
                 userId: userId,
@@ -97,6 +133,7 @@ const getPostById = async (postId: number, userId?: number) => {
         }
     }
 
+    // 스프레드 문법
     return {
         ...post,
         vote: {
@@ -115,8 +152,45 @@ const createPost = async (postData: PostCreateInput) => {
     });
 };
 
+const votePost = async (postId: number, userId: number, option: number) => {
+    // 1. postId의 글이 존재 유뮤 (소프트삭제로 고려)
+    const post = await prisma.post.findFirst({
+        where: {
+            id: postId,
+            deletedAt: null,
+        },
+    });
+    if (!post) {
+        throw new Error("NOT_FOUND");
+    }
+
+    // 2. option1Text와 option2Text가 있는 체크
+    if (!post.option1Text || !post.option2Text) {
+        throw new Error("NOT_VOTABLE");
+    }
+
+    // 3. 이사용자가 투표를 이미 진행했는지 체크
+    const existingVote = await prisma.vote.findUnique({
+        where: {
+            userId_postId: { userId, postId },
+        },
+    });
+    if (existingVote) {
+        throw new Error("ALREADY_VOTED");
+    }
+
+    return prisma.vote.create({
+        data: {
+            userId,
+            postId,
+            option,
+        }
+    })
+};
+
 export default {
     getPostsByCategory,
     createPost,
     getPostById,
+    votePost,
 };

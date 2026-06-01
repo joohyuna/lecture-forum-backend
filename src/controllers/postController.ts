@@ -3,6 +3,7 @@ import postService from "../services/postService.ts";
 import { CreatePostInputType } from "../schemas/post/createPostSchema.ts";
 import { PostCreateInput } from "../generated/prisma/models/Post.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
+import { VotePostInputType } from "../schemas/post/votePostSchema.ts";
 
 const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Response) => {
     try {
@@ -31,15 +32,32 @@ const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Res
     }
 };
 
+// 컨트롤러는 기본적으로 Express에서 제공해주는 타입의 Request와 Response를 사용해야 했던것
+// 그 규칙안에 Request에 동적 라우팅을 통해 주소값을 가져오려면 Generic인 Request<{id: string}>
+// +
+// 우리는 미들웨어를 통해, req라고 하는 요청 내용가 담기는 박스에 req.user 항목을 집어 넣기로 한 것
+// 그렇기 때문에 AuthRequest라고, Request 타입을 상속받은 것으로 교체할 생각
+// =
+// 이렇게 했더니, 우리가 만든 AuthRequest는 Generic이 아니라서 동적 라우팅을 받을 수가 없네?
+// 이렇게 어떻게든 해결을 해야 된다며?
+// GET 방식으로 받게끔 디자인 했기 때문에 동적 라우팅을 썼던 것,
+// POST 방식으로 하던 req.body를 쓸수 있게됨
+// GET 방식으로 조회를 할 때 쓰고, POST는 생성할 때 쓰고, PATCH와 PUT은 수정할 때, 쓰고, DELETE는 지울 때 쓰고
+// 느슨하게 적용을 해도 됩니다. => 이렇게 나눈 것은 백엔드 프론트엔드가 합의 하면 어겨도 됨 (예시: 내건물에서는 이렇게 쓰겠다)
+
+// POST 방식으로 교체하면 문제 해결이 가능하지만,
+// GET 방식을 고수하여 정석적으로 해결을 하려 한다면, 우리가 만든 AuthRequest 인터페이스가
+// 부모 인터페이스인 Request의 제네릭을 수용할 수 있도록 고쳐야 함
+
 const getPostById = async (req: AuthRequest<{ id: string }>, res: Response) => {
     // 원래, 글 내용 조회라는 기능엔 "조회하는 사람이 누군가"는 중요하지 않았음
-    // 근데 "죄회하는 사람이" 투표를 했나 안했나를 알기 위해서는 "그 사람"이 누군가를 알아야함
+    // 근데 "조회하는 사람이" 투표를 했나 안했나를 알기 위해서는 "그 사람"이 누군가를 알아야함
 
     // 글의 내용을 요청하는 사람에 대한 정보를 알기 위해서는 어디에 접근해야 하는가?
     // 지금 접속한 사람에 대한 정보는
     // 프론트엔드만 저장하고 있음   => Zustand에서 찾을 수 있음 (저장하고 있으니까)
     // 백엔드는 저장하고 있지 않음  => 메모리에서 찾을 수 없음
-    // 그렇기 때문에 매 번 프론트엔드가 신분증 정보를 요처(Request)의 헤더(headers)에 첨부해서 보내기 때문에
+    // 그렇기 때문에 매 번 프론트엔드가 신분증 정보를 요청(Request)의 헤더(headers)에 첨부해서 보내기 때문에
     // 매 요청 때마다 HTTP 메세지(Request)를 까서 헤더에 접근해서 헤더에서
     // 토큰을 가져와 사용자정보를 확인함
     try {
@@ -66,16 +84,18 @@ const getPostById = async (req: AuthRequest<{ id: string }>, res: Response) => {
 };
 
 const createPost = async (req: AuthRequest, res: Response) => {
-    // req.body에 들어온 값들을 꺼내서, 서비비스로 보내주야함
-    // 즉 req.body로 들어온 내용을 토애고 데이터베이스에 쓸수 있는 타입 객체로 바꾸서 보내야함
+    // 글을
+
+    // req.body에 들어온 값들을 꺼내서, 서비스로 보내줘야함
+    // 즉 req.body로 들어온 내용을 토대로 데이터베이스에 쓸수 있는 타입 객체로 바꿔서 보내야함
     try {
-        // 지금 요청을 하고 있는 사람이 누군지를 알아내어, 데이터베이스에서 그 사용자 정복와 post를 연결해야 함
+        // 지금 요청을 하고 있는 사람이 누군지를 알아내어, 데이터베이스에서 그 사용자 정보와 post를 연결해야 함
         // 누군지 알아내려면 그 정보를 req.headers.authorization을 까서
         // 그 token을 복호화 하면 { userId: number } 정보를 통해 user 테이블에서 사용자 정보를 불러오고
         // 그 사용자의 ID를 가지고 연결을 지어야함
 
         // 근데 이과정을 보니, 우리가 middleware은 만들었던 authenticate가 하는 일이랑 똑같네?
-        // authenticate를 보니, req 박스에다가 이미 user라는 항복을 만들어서 스티커를 붙여서 보내주고 있네
+        // authenticate를 보니, req 박스에다가 이미 user라는 항목을 만들어서 스티커를 붙여서 보내주고 있네
 
         const user = req.user;
         if (!user) {
@@ -111,8 +131,59 @@ const createPost = async (req: AuthRequest, res: Response) => {
     }
 };
 
+export const votePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
+    try {
+        // 투표가 이루어지는 글번호(ID) => 동적 라우팅을 통해 주소  => AuthRequest
+        // 투표를 한 사람의 ID          =>  req.user => req라는 요청 내용 박스의 모양이 바뀌어야 함
+        // 어디에 투표를 했는데         =>  req.body => schema를 썼다는 것은 req.body가 있다는 말임
+
+        // R -> C -> S
+        // middleware
+
+        // Page Components -> 백엔드 요청> api axios -> schema
+
+        const postId = Number(req.params.postId);
+        if (isNaN(postId)) {
+            res.status(400).json({ message: "유효하지 않은 게시물 ID 입니다." });
+            return;
+        }
+
+        // authenticate라는 미들웨어로 사용자가 무조건 존재향 여기에 도달한다고 제한을 뒀지만,
+        // 그것은 내가 알뿐, 이 파일만 보고 있는 Typescript 엔진은 모름
+        if (!req.user) {
+            res.status(401).json({ message: "인증되지 않은 사용자입니다." });
+            return;
+        }
+        const userId = req.user.id;
+
+        const { option }: VotePostInputType = req.body;
+        await postService.votePost(postId, userId, option);
+        res.status(200).json({ message: "투표 결과가 정상적으로 저장되었습니다." });
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.name === "NOT_FOUND") {
+                res.status(400).json({ message: "존재하지 않거나 삭제된 게시물입니다." });
+                return;
+            }
+            if (error.message === "NOT_FOUND") {
+                res.status(400).json({
+                    message: "투표가 활성화되지 않은 게시물입니다.",
+                });
+                return;
+            }
+            if (error.message === "ALREADY_VOTED") {
+                res.status(400).json({ message: "이미 투표에 참여하셨습니다." });
+                return;
+            }
+        }
+        console.error(error);
+        res.status(500).json({ message: "투표 처리 중 서버 에러가 발생했스빈다." });
+    }
+};
+
 export default {
     getPostsByCategory,
     createPost,
     getPostById,
+    votePost,
 };
