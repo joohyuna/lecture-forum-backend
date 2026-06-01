@@ -76,7 +76,7 @@ const getPostById = async (postId: number, userId?: number) => {
             option: 1,
         },
     });
-    const option2count = await prisma.vote.count({
+    const option2Count = await prisma.vote.count({
         where: {
             postId: postId,
             option: 2,
@@ -138,8 +138,8 @@ const getPostById = async (postId: number, userId?: number) => {
         ...post,
         vote: {
             option1Count,
-            option2count,
-            totalCount: option1Count + option2count,
+            option2Count,
+            totalCount: option1Count + option2Count,
             hasVoted,
         },
     };
