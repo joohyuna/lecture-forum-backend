@@ -6,7 +6,6 @@ import {
 } from "../../generated/prisma/models/Category.ts";
 import { AdminCreateCategoryInputType } from "../../schemas/admin/category/createCategory.ts";
 import { CategoryStatus } from "../../generated/prisma/enums.ts";
-import { AdminUpdateCategoryInputType } from "../../schemas/admin/category/updateCategory.ts";
 
 const getCategoryList = async (req: Request, res: Response) => {
     try {
@@ -39,7 +38,7 @@ const getCategoryById = async (req: Request<{id: string}>, res: Response) => {
         })
 
     } catch (error) {
-        if(error instanceof Error && error.message === "CATEGORY NOT_FOUND") {
+        if (error instanceof Error && error.message === "CATEGORY_NOT_FOUND") {
             res.status(404).json({
                 message: "존재하지 않는 카테고리입니다.",
             })
@@ -116,6 +115,7 @@ const updateCategory = async (req: Request<{ id: string }>, res: Response) => {
 
         // /admin/category/1
         // 이 기능을 동작시키는데 필요한 정보는 id와 name, 2가지 인데
+        // name에 대해서는 이미 router에서 validate를 통해 검증 했고
         // id에 대해선 위코드로 검증햇으니
         // service로 보내면 됨
 

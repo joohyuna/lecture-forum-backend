@@ -165,7 +165,7 @@ const votePost = async (req: AuthRequest<{ postId: string }>, res: Response) => 
                 res.status(404).json({ message: "존재하지 않거나 삭제된 게시물입니다." });
                 return;
             }
-            if (error.message === "NOT_FOUND") {
+            if (error.message === "NOT_VOTABLE") {
                 res.status(400).json({
                     message: "투표가 활성화되지 않은 게시물입니다.",
                 });
@@ -177,7 +177,7 @@ const votePost = async (req: AuthRequest<{ postId: string }>, res: Response) => 
             }
         }
         console.error(error);
-        res.status(500).json({ message: "투표 처리 중 서버 에러가 발생했스빈다." });
+        res.status(500).json({ message: "투표 처리 중 서버 에러가 발생했습니다.." });
     }
 };
 
@@ -193,7 +193,7 @@ const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Respons
         const postId = Number(req.params.postId);
         if (isNaN(postId)) {
             res.status(400).json({
-                message: "유효하지 않은 게시품 ID 입니다."
+                message: "유효하지 않은 게시물 ID 입니다."
             });
             return;
         }
@@ -215,12 +215,12 @@ const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Respons
         if (error instanceof Error) {
             if (error.message === "NOT_VOTED") {
                 res.status(404).json({
-                    message: "취소한 투표 내용이 존재하지 않습니다."
+                    message: "취소할 투표 내용이 존재하지 않습니다."
                 });
                 return;
             }
         }
-        console.error(error);
+        console.log(error);
         res.status(500).json({
             message: "투표 취소중 서버 에러가 발생했습니다."
         });

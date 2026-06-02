@@ -53,8 +53,9 @@ model User {
   gender      GenderType
   role        RoleType   @default(USER) // 삽입할 때 기본값으로 USER 기록
 
-  posts Post[]
-  votes Vote[]
+  posts   Post[]
+  votes   Vote[]
+  replies Reply[]
 }
 
 model Category {
@@ -91,6 +92,7 @@ model Post {
   category   Category @relation(fields: [categoryId], references: [id])
   // 이렇게 쓰는 것은 부모쪽 임 부모쪽에서는 가상 칼럼, 단지 우리가 조회를 할때 3번글이 거기에 해당하는 글이 있는지 Join을 해온다
   votes      Vote[]
+  replies    Reply[]
 
   @@index([userId])
   @@index([categoryId])
@@ -99,7 +101,7 @@ model Post {
 // User와 Post에 대한 자식 테이블 임 Post가 없다면
 // 투표에 대한것
 model Vote {
-  id        Int      @id @default(autoincrement())  // Pk 자동으로 unique가 걸려 있음
+  id        Int      @id @default(autoincrement()) // Pk 자동으로 unique가 걸려 있음
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   option    Int // 몇 번에 투표했는지
@@ -129,3 +131,41 @@ model Vote {
   @@index([postId]) // foreign key
   @@index([userId]) // foreing key
 }
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String   @db.Text
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+
+  @@index([userId])
+  @@index([postId])
+}
+
+// 데이터베이스 "(SQL 데이터베이스) 의  칼럼에 값은 1개 값만 들어갈 수 있음"
+// 그렇게 적은 Reply 테이블의 user라는 항목(칼럼) 과 post 라는 항목(칼럼)의 타입을 객체 타임
+// 즉, user와 post라는 항목의 타입인 객체는 데이터베이스에 들어갈수 없음
+// 재네는 userId값을 가지고 User 테이블에서 데이터를 겁색해와서 Prisma가 넣어주는 (JOIN) 항목임
+
+// 데이터베이스를 놓고   => Prisma
+// MariaDB  => Prisma를 사용함
+// mongoDB   => Prisma를 사용함
+
+// SQL에서는 조회할 때 SQL(Query) => SELECT를 쓰잖아요?
+// NoSQL에서는 조회할 때 어떻게 조회해요?
+
+// mongoDB 라는 애는 조회를 하는 프로그램(Javasdript)이 내장
+// mongoDB 자체를 쓸때도, post.findFirst()명령을 쓰면됨  > mongoDB 프로그램을 보고 prisma가 만들어졌음
+
+
+// SQL 데이터베이스는 정형화된 데이트를 기반으로 하는 내용을 담당 (User 같음, Payment)
+// NoSQL 데이터베이스는 데이터를 빠르게 저장하는 내용을 담당  (Log, 조회수, Like 같은)
+
+// NoSQL은 칼럼에 객체, Array가 저장 가능  : 선택적 Relation
+// User - Post(Vote 칼럼을 포함시켜서 Array 저장)
+// SQL은 칼렁메 1개의 값만 저장 가능 : 무조건 Relation

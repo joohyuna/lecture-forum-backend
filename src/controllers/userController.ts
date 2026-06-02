@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserCreateInput } from "../generated/prisma/models/User.ts"; // 안에 있는것을 가져옴
 import userService from "../services/userService.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
-import { LoginInputType } from "../schemas/user/login.ts"; //
+import { LoginInputType } from "../schemas/user/login.ts";
 
 const createUser = async (req: Request, res: Response) => {
     try {

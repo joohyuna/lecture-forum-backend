@@ -29,21 +29,23 @@ const getUserById = async (req: Request<{ id: string }>, res: Response) => {
     try {
         const id = Number(req.params.id);
         if (isNaN(id)) {
-            res.status(404).json({});
+            res.status(400).json({
+                message: "유효하지 않은 사용자 ID입니다.",
+            });
             return;
         }
 
         const user = await adminUserService.getUserById(id);
 
-        res.status(200).json({ message: "유저 정보를 성공적으로 불러왔습니다.", data: user });
+        res.status(200).json({
+            message: "유저 정보를 성공적으로 불러왔습니다.",
+            data: user,
+        });
     } catch (error) {
-        if (error instanceof Error && error.message === "USER_NOT_FOUND") {
-            res.status(404).json({ message: "존재하지 않는 유저입니다." });
-            return;
-        }
-
         console.log(error);
-        res.status(500).json({ message: "서버에 에러가 발생했습니다." });
+        res.status(500).json({
+            message: "유저 목록을 불러오는 중 오류가 발생했습니다.",
+        });
     }
 };
 
@@ -69,7 +71,7 @@ const createUser = async (req: Request, res: Response) => {
 
         const result = await adminUserService.createUser(newUser);
 
-        res.status(200).json({
+        res.status(201).json({
             message: "유저를 성공적으로 생성했습니다.",
             data: result,
         });
@@ -90,11 +92,11 @@ const createUser = async (req: Request, res: Response) => {
                 default:
                     console.log(error);
                     res.status(500).json({ message: "유저 생성 중 오류가 발생했습니다." });
-                    return;
             }
         }
 
-        res.status(500).json({ message: "서버 에러가 발생했습니다." });
+        console.log(error);
+        res.status(500).json({ message: "유저 생성 중 오류가 발생했습니다." });
     }
 };
 
@@ -131,7 +133,7 @@ const updateUser = async (req: Request<{ id: string }>, res: Response) => {
 
         const result = await adminUserService.updateUser(newUser, id);
 
-        res.status(200).json({
+        res.status(201).json({
             message: "유저를 성공적으로 생성했습니다.",
             data: result,
         });

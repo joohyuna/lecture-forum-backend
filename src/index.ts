@@ -5,6 +5,7 @@ import cors from "cors";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import categoryRouter from "./routes/categoryRouter.ts";
 import postRouter from "./routes/postRouter.ts";
+import replyRouter from "./routes/replyRouter.ts";
 
 dotenv.config();
 
@@ -41,6 +42,8 @@ app.use("/user", userRouter);
 
 app.use("/category", categoryRouter);
 app.use("/post", postRouter);
+
+app.use("/reply", replyRouter);
 
 // user 인지 검증 user인지 관리자 인지 확인
 // 로그인 하고 authenticate 토근 인증으로 회원확인
