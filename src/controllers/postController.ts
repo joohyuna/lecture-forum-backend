@@ -131,7 +131,7 @@ const createPost = async (req: AuthRequest, res: Response) => {
     }
 };
 
-export const votePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
+const votePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
     try {
         // 투표가 이루어지는 글번호(ID) => 동적 라우팅을 통해 주소  => AuthRequest
         // 투표를 한 사람의 ID          =>  req.user => req라는 요청 내용 박스의 모양이 바뀌어야 함
@@ -181,9 +181,56 @@ export const votePost = async (req: AuthRequest<{ postId: string }>, res: Respon
     }
 };
 
+const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
+    // 동적 라우팅을 통해 postId 즉, 취소해야 하는 투표가 이루어진 글 ID
+    // 쿼리스트링은 X
+    // req.body X 없으면 validate 필요없다.
+    // req.user 가 필요한데 이걸 뽑아내려면 미들웨어를 통과시켜줘야 함 authenticate, 와 AuthRequest 우리가 만들어준
+
+    // controller에서는 밖으로 데이터를 출력시키는 최전방에 해당하니까,
+    //   앤 무조건 try -catch
+    try {
+        const postId = Number(req.params.postId);
+        if (isNaN(postId)) {
+            res.status(400).json({
+                message: "유효하지 않은 게시품 ID 입니다."
+            });
+            return;
+        }
+        if (!req.user) {
+            res.status(401).json({
+                message: "로그인이 필요한 서비스입니다.",
+            });
+            return;
+        }
+
+        const userId = req.user.id;
+
+        // "이 사람"이 "저 글"에 투표한 내용을 취소시켜줘
+        await postService.cancelVotePost(postId, userId);
+        res.status(200).json({
+            message: "투표가 취소되었습니다.",
+        })
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message === "NOT_VOTED") {
+                res.status(404).json({
+                    message: "취소한 투표 내용이 존재하지 않습니다."
+                });
+                return;
+            }
+        }
+        console.error(error);
+        res.status(500).json({
+            message: "투표 취소중 서버 에러가 발생했습니다."
+        });
+    }
+};
+
 export default {
     getPostsByCategory,
     createPost,
     getPostById,
     votePost,
+    cancelVotePost,
 };
