@@ -185,7 +185,8 @@ const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Respons
     // 동적 라우팅을 통해 postId 즉, 취소해야 하는 투표가 이루어진 글 ID
     // 쿼리스트링은 X
     // req.body X 없으면 validate 필요없다.
-    // req.user 가 필요한데 이걸 뽑아내려면 미들웨어를 통과시켜줘야 함 authenticate, 와 AuthRequest 우리가 만들어준
+    // req.user 가 필요한데 이걸 뽑아내려면 미들웨어를 통과시켜줘야 함
+    // authenticate, 우리가 만들어준 규격의 박스 AuthRequest
 
     // controller에서는 밖으로 데이터를 출력시키는 최전방에 해당하니까,
     //   앤 무조건 try -catch

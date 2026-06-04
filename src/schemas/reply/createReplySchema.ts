@@ -1,4 +1,3 @@
-import { createPostSchema } from "../post/createPostSchema.ts";
 import { z } from "zod";
 
 export const createReplySchema = z.object({

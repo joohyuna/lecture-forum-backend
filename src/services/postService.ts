@@ -207,13 +207,14 @@ const cancelVotePost = async (postId: number, userId: number) => {
             userId_postId: { userId, postId },
         },
     });
+    return;
 
     // const result = await prisma.vote.create({ date: {}})   => 그렇게 생성된 vote 객체 (후결과)
     // const result = await prisma.vote.update({ where: {}, data: {} }) => 그렇게 업데이트됨  vote 객체 (후결과)
     // const result = await prisma.vote.findFirst({ where: {} })  => 그렇게 검색한 vote 객체 => 없으면 null
     // const result = await prisma.vote.findUnique({ where: {} })  => 그렇게 검색한 vote 객체 => 없으면 null
-    // const result = await
-    return;
+    // const result = await prisma.vote.findMany({ where: {}})  => 그렇게 검색한 vote Array => 없으면 []
+    // const result = await prisma.vote.delete({ where: {} }) => 그렇게 삭제된 vote  객체 (전내용)
 };
 
 export default {

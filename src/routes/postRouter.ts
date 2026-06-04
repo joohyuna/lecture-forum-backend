@@ -21,6 +21,7 @@ export default router;
 // requiredAdmin : 로그인도 되어져 있고, 관리자만 컨트롤러로 가게 하겠다
 // validate: req.body에 담져 오는 내용에 대한 체크 (schema가 있다는 것은 body가 있다는 말)
 // req.body라는건, 프론트엔드에서 보내주는 바구니 안에 담긴 내용물
+// req.body가 없으면, validate가 필요없다
 
 
 // 주소값: 동적 라우팅을 통한 params, 쿼리스트링
