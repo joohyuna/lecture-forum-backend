@@ -12,7 +12,7 @@ const mockPostList = [
     {
         title: "아이스 아메리카노 vs 따뜻한 아메리카노",
         option1Text: "얼죽아",
-        option2Text: "쪄죽아",
+        option2Text: "쪄죽따",
     },
     {
         title: "치킨 먹을 때",
@@ -92,10 +92,10 @@ async function seedPosts() {
                     option1Text: topic.option1Text,
                     option2Text: topic.option2Text,
                     content:
-                        "이 게시글은 토론 대난투 시스템을 검증하기 위해 생성된 자동화 테스트 글입니다.\n\n" +
+                        "이 게시글은 토론대난투 시스템을 검증하기 위해 생성된 자동화 테스트 글입니다.\n\n" +
                         "과연 여러분의 선택은 어느 쪽인가요?\n" +
-                        `1번 ${topic.option1Text}과 2번 ${topic.option2Text}중 마음에 드는 진영에 투표하고` +
-                        "아래 댓글 창에서 논리 제압을 시작해주세요",
+                        `1번 ${topic.option1Text} 과 2번 ${topic.option2Text} 중 마음에 드는 진영에 투표하고` +
+                        "아래 댓글 창에서 논리 제압을 시작해주세요!",
                     category: { connect: { id: category.id } },
                     user: { connect: { id: user.id } },
                 };
