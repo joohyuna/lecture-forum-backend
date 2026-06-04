@@ -66,9 +66,9 @@ const createReply = async (req: AuthRequest, res: Response) => {
     }
 };
 
-const deleteReply = async (req: AuthRequest<{ requestId: string }>, res: Response) => {
+const deleteReply = async (req: AuthRequest<{ replyId: string }>, res: Response) => {
     try {
-        const id = Number(req.params.requestId);
+        const id = Number(req.params.replyId);
         if (isNaN(id)) {
             res.status(400).json({
                 message: "유효하지 않은 댓글 ID 입니다.",
