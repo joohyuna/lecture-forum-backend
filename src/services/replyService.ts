@@ -70,6 +70,29 @@ const createReply = async (userId: number, postId: number, content: string) => {
     });
 };
 
+const updateReply = async (id: number, userId: number, content: string) => {
+    const reply = await prisma.reply.findUnique({
+        where: {
+            id,
+        },
+    });
+    if (!reply) {
+        throw new Error("NOT_FOUND_REPLY");
+    }
+    if (reply.userId !== userId) {
+        throw new Error("FORBIDDEN");
+    }
+
+    return prisma.reply.update({
+        where: {
+            id,
+        },
+        data: {
+            content,
+        }
+    });
+}
+
 const deleteReply = async (id: number, postId: number) => {
     const reply = await prisma.reply.findUnique({
         where: {
@@ -92,6 +115,7 @@ const deleteReply = async (id: number, postId: number) => {
 
 export default {
     getRepliesByPostId,
+    updateReply,
     createReply,
     deleteReply,
 };

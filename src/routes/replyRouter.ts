@@ -3,11 +3,13 @@ import { authenticate } from "../middlewares/auth.ts";
 import replyController from "../controllers/replyController.ts";
 import { createReplySchema } from "../schemas/reply/createReplySchema.ts";
 import { validate } from "../middlewares/validate.ts";
+import { updateReplySchema } from "../schemas/reply/updateReplySchema.ts";
 
 const router = Router();
 
 router.get("/:postId", replyController.getRepliesByPostId);
 router.post("/create", authenticate, validate(createReplySchema), replyController.createReply);
+router.patch("/:replyId", authenticate, validate(updateReplySchema), replyController.updateReply);
 router.delete("/:replyId", authenticate, replyController.deleteReply);
 
 
@@ -44,3 +46,9 @@ export default router;
 
 //  /reply/:postId/:page/:size 경로를 / 로 나누었을 때 4개가 동일
 // /replay/:postId
+
+
+// UPDATE
+// 댓글수정기능 => HTTP 메서드 : patch
+// content: req.body
+// userId: 받을필요없다 => req.headers 존재 => authenticate 미들웨

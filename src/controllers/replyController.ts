@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import { CreateReplyInputType } from "../schemas/reply/createReplySchema.ts";
 import replyService from "../services/replyService.ts";
+import { UpdateReplyInputType } from "../schemas/reply/updateReplySchema.ts";
 
 const getRepliesByPostId = async (req: Request<{ postId: string }>, res: Response) => {
     // service에 전달되어야 되는 값이 postId, page, size
@@ -66,6 +67,54 @@ const createReply = async (req: AuthRequest, res: Response) => {
     }
 };
 
+const updateReply = async (req: AuthRequest<{replyId: string}>, res: Response) => {
+    try {
+        const id = Number(req.params.replyId);
+        if (isNaN(id)) {
+            res.status(400).json({
+                message: "유효하지 않은 댓글 ID 입니다.",
+            });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({
+                message: "로그인이 필요한 서비스 입니다.",
+            });
+            return;
+        }
+        const userId = req.user.id;
+
+        const  { content }: UpdateReplyInputType = req.body;
+
+        const result = await replyService.updateReply(id, userId, content);
+        res.status(200).json({
+            message: "댓글이 성공적으로 수정 되었습니다.",
+            data: result,
+        });
+
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_REPLY") {
+                res.status(404).json({
+                    message: "존재하지 않는 댓글입니다.",
+                });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({
+                    message: "댓글 삭제 권한이 없습니다. . ",
+                });
+                return;
+            }
+        }
+        console.log(error);
+        res.status(500).json({
+            message: "댓글 삭제 중 서버 오류가 발생되었습니다. ",
+        });
+    }
+}
+
 const deleteReply = async (req: AuthRequest<{ replyId: string }>, res: Response) => {
     try {
         const id = Number(req.params.replyId);
@@ -113,5 +162,6 @@ const deleteReply = async (req: AuthRequest<{ replyId: string }>, res: Response)
 export default {
     getRepliesByPostId,
     createReply,
+    updateReply,
     deleteReply,
 };
