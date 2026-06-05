@@ -67,7 +67,7 @@ const createReply = async (req: AuthRequest, res: Response) => {
     }
 };
 
-const updateReply = async (req: AuthRequest<{replyId: string}>, res: Response) => {
+const updateReply = async (req: AuthRequest<{ replyId: string }>, res: Response) => {
     try {
         const id = Number(req.params.replyId);
         if (isNaN(id)) {
@@ -85,14 +85,13 @@ const updateReply = async (req: AuthRequest<{replyId: string}>, res: Response) =
         }
         const userId = req.user.id;
 
-        const  { content }: UpdateReplyInputType = req.body;
+        const { content }: UpdateReplyInputType = req.body;
 
         const result = await replyService.updateReply(id, userId, content);
         res.status(200).json({
             message: "댓글이 성공적으로 수정 되었습니다.",
             data: result,
         });
-
     } catch (error) {
         if (error instanceof Error) {
             if (error.message === "NOT_FOUND_REPLY") {
@@ -113,7 +112,7 @@ const updateReply = async (req: AuthRequest<{replyId: string}>, res: Response) =
             message: "댓글 삭제 중 서버 오류가 발생되었습니다. ",
         });
     }
-}
+};
 
 const deleteReply = async (req: AuthRequest<{ replyId: string }>, res: Response) => {
     try {

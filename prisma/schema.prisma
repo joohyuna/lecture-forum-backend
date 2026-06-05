@@ -169,3 +169,14 @@ model Reply {
 // NoSQL은 칼럼에 객체, Array가 저장 가능  : 선택적 Relation
 // User - Post(Vote 칼럼을 포함시켜서 Array 저장)
 // SQL은 칼렁메 1개의 값만 저장 가능 : 무조건 Relation
+
+
+model Notice {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title String
+  content String @db.Text
+
+  // Post에는 글쓴이가 필요히니까 User 관계를
+}
