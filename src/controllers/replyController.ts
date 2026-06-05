@@ -92,22 +92,21 @@ const deleteReply = async (req: AuthRequest<{ replyId: string }>, res: Response)
         if (error instanceof Error) {
             if (error.message === "NOT_FOUND_REPLY") {
                 res.status(404).json({
-                    message: "존재하지 않는 댓글입니다."
-                })
+                    message: "존재하지 않는 댓글입니다.",
+                });
                 return;
             }
             if (error.message === "FORBIDDEN") {
                 res.status(403).json({
-                    message: "댓글 삭제 권한이 없습니다. . "
-                })
+                    message: "댓글 삭제 권한이 없습니다. . ",
+                });
                 return;
             }
         }
         console.log(error);
         res.status(500).json({
-            message: "댓글 삭제 중 서버 오류가 발생되었습니다. "
-        })
-
+            message: "댓글 삭제 중 서버 오류가 발생되었습니다. ",
+        });
     }
 };
 

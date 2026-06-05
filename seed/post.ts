@@ -46,8 +46,6 @@ const mockPostList = [
     },
 ];
 
-interface CreatePostCreateInput {}
-
 async function seedPosts() {
     try {
         const categories = await categoryService.getActiveCategories();
@@ -99,13 +97,22 @@ async function seedPosts() {
                     category: { connect: { id: category.id } },
                     user: { connect: { id: user.id } },
                 };
+                // 불량상태만 버리고 다시 작업시장 이것을 하지 않으면 전체에 대해서 동작이 멈춤
+                // 전체가 controller 이고 이 부분이 service라고 생각하면 된다.
+                try {
+                    await postService.createPost(dummyDate);
+                    console.log(`[${i}/${postsPerCategory} : 카테고리ID(${category.id}] 게시글 등록 성공`,);
+                } catch (error) {
+                    console.log(`[${i}/${postsPerCategory} : 카테고리ID(${category.id}] 게시글 등록 실패`,);
+                }
 
-                await postService.createPost(dummyDate);
-                console.log(`[${i}/${postsPerCategory} : 카테고리ID(${category.id}] 게시글 등록 성공`);
             }
         }
     } catch (error) {
-        console.log("시딩 작업 중 오류가 발생되었습니다. ", error)
+        console.log("시딩 작업 중 오류가 발생되었습니다. ", error);
+    } finally {
+        // 데이터 베이스 연결을 끊은 메서드
+        await prisma.$disconnect();
     }
 }
 
