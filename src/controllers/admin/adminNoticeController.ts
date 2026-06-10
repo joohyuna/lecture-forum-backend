@@ -50,9 +50,9 @@ const updateNotice = async (req: Request<{ noticeId: string }>, res: Response) =
     }
 };
 
-const deleteNotice = async (req: Request<{ requestId: string }>, res: Response) => {
+const deleteNotice = async (req: Request<{ noticeId: string }>, res: Response) => {
     try {
-        const id = Number(req.params.requestId);
+        const id = Number(req.params.noticeId);
         if (isNaN(id)) {
             res.status(400).json({
                 message: "유효하지 않은 공지사항 ID입니다.",

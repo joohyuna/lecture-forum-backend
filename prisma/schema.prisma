@@ -53,9 +53,10 @@ model User {
   gender      GenderType
   role        RoleType   @default(USER) // 삽입할 때 기본값으로 USER 기록
 
-  posts   Post[]
-  votes   Vote[]
-  replies Reply[]
+  posts     Post[]
+  votes     Vote[]
+  replies   Reply[]
+  inquiries Inquiry[]
 }
 
 model Category {
@@ -162,7 +163,6 @@ model Reply {
 // mongoDB 라는 애는 조회를 하는 프로그램(Javasdript)이 내장
 // mongoDB 자체를 쓸때도, post.findFirst()명령을 쓰면됨  > mongoDB 프로그램을 보고 prisma가 만들어졌음
 
-
 // SQL 데이터베이스는 정형화된 데이트를 기반으로 하는 내용을 담당 (User 같음, Payment)
 // NoSQL 데이터베이스는 데이터를 빠르게 저장하는 내용을 담당  (Log, 조회수, Like 같은)
 
@@ -170,13 +170,30 @@ model Reply {
 // User - Post(Vote 칼럼을 포함시켜서 Array 저장)
 // SQL은 칼렁메 1개의 값만 저장 가능 : 무조건 Relation
 
-
 model Notice {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  title String
-  content String @db.Text
+  title     String
+  content   String   @db.Text
 
-  // Post에는 글쓴이가 필요히니까 User 관계를
+  // Post에는 글쓴이가 필요하니까 User와 관계를 맺었지만, Notice는 관계를 맺지 않아도 됨
+}
+
+model Inquiry {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  title      String // 사용자가 문의를 할 때 남겨야 되는 것
+  content    String // 사용자가 문의를 할 때 남겨야 되는 것
+  answer     String?
+  answeredAt DateTime?
+
+  // 사용자가 문의를 남길 때에 필요한 정보는 title, content     => create를 할 것임
+  // 관리자가 문의 답변을 남길 때에는 answer를 받아서   => 지금 현재시간을 추가해서 update를 할 것임
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
