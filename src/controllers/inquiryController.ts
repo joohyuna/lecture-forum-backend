@@ -161,10 +161,10 @@ const deleteInquiry = async (req: AuthRequest<{ inquiryId: string }>, res: Respo
         const userId = req.user.id;
 
         // 서비스를 조합 사용한다. 라는 방식으로 진행
-        // 삭제할 게시물의 존재 유뮤 판별
+        // 삭제할 게시물의 존재 유무 판별
         const inquiry = await inquiryService.getInquiryById(inquiryId);
 
-        // 게시불물이 존재 하지 않아
+        // 게시물이 존재 하지 않아
         if (!inquiry) {
             res.status(404).json({
                 message: "문의글을 찾을 수 없습니다.",

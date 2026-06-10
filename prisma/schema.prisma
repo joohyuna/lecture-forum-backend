@@ -189,6 +189,8 @@ model Notice {
 // 문의 수정 기능을 만들어야 할까? (답변이 끝난 후 수정을 하는 일은 관리자 의 알빠)
 // 삭제기능 (언제든지 삭제해도 문제는 없지 답변이 끝난 후 지우는 일은 관리자의 알빠가 아님, 아니면 알빠)
 // 삭제기능 => delete
+
+
 model Inquiry {
   id         Int       @id @default(autoincrement())
   createdAt  DateTime  @default(now())

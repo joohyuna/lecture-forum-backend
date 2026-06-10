@@ -104,7 +104,7 @@ const updateInquiry = async (inquiryId: number, title: string, content: string, 
     // 업데이트 하기 전 게시물이 있는지 체크
     const inquiry = await getInquiryById(inquiryId);
 
-    // 이게시물리 이사람 꺼닞 확인
+    // 이 게시물이 이사람 것인지 확인
     if (inquiry.userId !== userId) {
         throw new Error("NOT_YOUR_INQUIRY");
     }

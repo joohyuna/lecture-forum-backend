@@ -20,7 +20,7 @@ router.get("/:inquiryId", adminInquiryController.getInquiryById);
 // 주소를/admin/inquiry/글번호/create 할 경우 -> patch
 // 처음 설계할 때에는 "수정"을 만들기 생각했는데 다시글 따져보니 이 API를 생성과 수정이 같이 이용하게 되어서
 // post 방식이 아닌 patch 로 변경
-router.patch("/:inquiryId", validate(inquiryAnswerSchema),  adminInquiryController.answerInquiry);
+router.patch("/:inquiryId", validate(inquiryAnswerSchema), adminInquiryController.answerInquiry);
 
 // 답변 수정 : patch
 // 주소를/admin/inquiry/글번호 -> patch
