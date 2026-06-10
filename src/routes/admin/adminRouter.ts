@@ -3,6 +3,7 @@ import adminCategoryRouter from "./category/adminCategoryRouter.ts";
 import adminUserRouter from "./user/adminUserRouter.ts";
 import { authenticate, requiredAdmin } from "../../middlewares/auth.ts";
 import adminNoticeRouter from "./notice/adminNoticeRouter.ts";
+import adminInquiryRouter from "./inquiry/adminInquiryRouter.ts";
 
 
 // /admin으로 들어오는 모든 Request
@@ -16,5 +17,6 @@ router.use(requiredAdmin);
 router.use("/category", adminCategoryRouter);
 router.use("/user", adminUserRouter);
 router.use("/notice", adminNoticeRouter);
+router.use("/inquiry", adminInquiryRouter);
 
 export default router;

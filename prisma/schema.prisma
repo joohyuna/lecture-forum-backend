@@ -180,6 +180,15 @@ model Notice {
   // Post에는 글쓴이가 필요하니까 User와 관계를 맺었지만, Notice는 관계를 맺지 않아도 됨
 }
 
+
+// API => CRUD // 생성, 조회, 수정, 삭제
+// 사용자 측에서 사용 가능한 API
+// 목록조회 => 내가 쓴 글에 대한 목록만 조회
+// 글 상세 조회 => 내가 쓴 글에 대한 상세만 조회
+// 글(문의) 등록
+// 문의 수정 기능을 만들어야 할까? (답변이 끝난 후 수정을 하는 일은 관리자 의 알빠)
+// 삭제기능 (언제든지 삭제해도 문제는 없지 답변이 끝난 후 지우는 일은 관리자의 알빠가 아님, 아니면 알빠)
+// 삭제기능 => delete
 model Inquiry {
   id         Int       @id @default(autoincrement())
   createdAt  DateTime  @default(now())
