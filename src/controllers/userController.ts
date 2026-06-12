@@ -3,6 +3,9 @@ import { UserCreateInput } from "../generated/prisma/models/User.ts"; // 안에 
 import userService from "../services/userService.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
 import { LoginInputType } from "../schemas/user/login.ts";
+import { AuthRequest } from "../middlewares/auth.ts";
+import { UpdatePasswordInputType } from "../schemas/user/updatePasswordSchema.ts";
+import { UpdateUserInputType } from "../schemas/user/updateUserSchema.ts";
 
 const createUser = async (req: Request, res: Response) => {
     try {
@@ -105,7 +108,52 @@ const login = async (req: Request, res: Response) => {
     }
 };
 
+const updateUser = async (req: AuthRequest, res: Response) => {
+    try {
+        // req.user
+        if (!req.user) {
+            res.status(400).json({ message: "인증되지 않은 사용자입니다." });
+            return;
+        }
+
+        const userId = req.user.id;
+
+        // req.body
+        const input: UpdateUserInputType = req.body;
+
+        const result = await userService.updateUser(userId, input);
+        res.status(200).json({
+            message: "회원 정보가 성공적으로 수정되었습니다.",
+            data: result,
+        });
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_USER") {
+                res.status(404).json({
+                    message: "해당 사용자를 찾을 수 없습니다.",
+                });
+                return;
+            } else if (error.message === "DUPLICATED_NICKNAME") {
+                res.status(409).json({
+                    message: "이미 존재하는 닉네임입니다.",
+                });
+                return;
+            } else if (error.message === "DUPLICATED_EMAIL") {
+                res.status(409).json({
+                    message: "이미 존재하는 이메일 입니다.",
+                });
+                return;
+            }
+        }
+        console.log(error);
+        res.status(500).json({
+            message: "서버 에러가 발생했습니다.",
+        });
+    }
+};
+
 export default {
     createUser,
     login,
+    updateUser,
 };

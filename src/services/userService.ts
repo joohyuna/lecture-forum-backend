@@ -4,6 +4,7 @@ import { Prisma } from "../generated/prisma/client.ts";
 import { LoginInputType } from "../schemas/user/login.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
 import jwtUtil from "../utils/jwt/jwtUtil.ts";
+import { UpdateUserInputType } from "../schemas/user/updateUserSchema.ts";
 
 const createUser = async (data: UserCreateInput) => {
     try {
@@ -60,12 +61,12 @@ const getUserById = async (id: number) => {
         where: {
             id,
         },
-    })
+    });
     if (!user) {
         throw new Error("USER_NOT_FOUND");
     }
     return user;
-}
+};
 
 const login = async (data: LoginInputType) => {
     // prisma.테이블.findUnique() : SELECT 명령 (단, Unique 칼럼을 통해)
@@ -106,8 +107,61 @@ const login = async (data: LoginInputType) => {
     // login에서는 필요가 없다.
 };
 
+const updateUser = async (userId: number, input: UpdateUserInputType) => {
+    const existUser = await prisma.user.findUnique({
+        where: {
+            id: userId,
+            deletedAt: null,
+        },
+    });
+    if (!existUser || existUser.deletedAt) {
+        throw new Error("NOT_FOUND_USER");
+    }
+
+    // nickname에 unique : 중복값이 허용되 않음
+    const existNickname = await prisma.user.findFirst({
+        where: {
+            nickname: input.nickname,
+            deletedAt: null,
+            id: {
+                not: userId,
+            },
+        },
+    });
+
+    if (existNickname) {
+        throw new Error("DUPLICATED_NICKNAME");
+    }
+
+    // email에 unique
+    const existEmail = await prisma.user.findFirst({
+        where: {
+            email: input.email,
+            deletedAt: null,
+            id: {
+                not: userId,
+            },
+        },
+    });
+
+    if (existEmail) {
+        throw new Error("DUPLICATED_EMAIL");
+    }
+
+    return prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            email: input.email,
+            nickname: input.nickname,
+            phoneNumber: input.phoneNumber ?? null, // 데이터베이스는 항목이 존재하면 무조건 써줘야함
+        },
+    });
+};
 export default {
     createUser,
     getUserById,
     login,
+    updateUser,
 };
