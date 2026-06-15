@@ -175,27 +175,28 @@ const updatePassword = async (userId: number, prevPw: string, pw: string) => {
     }
 
     // prevPw 사용자가 입력한 비밀번호는 평문
-    // user.password는 암호문
+    // user.password는 암호문이다.
     const isPasswordValid = await passwordUtil.verifyPassword(prevPw, user.password);
     if (!isPasswordValid) {
         throw new Error("INVALID_PASSWORD");
     }
 
+    // 그대로 전달하면 안됀다 다시 암호화를 해서
     const hashedPassword = await passwordUtil.hashPassword(pw);
 
-    // "지금 현재 비밀번호와 변경하려는 비밀번호가 같습니다. " 라는 에러로 팅겨 내려면
+    // "지금 현재 비밀번호와 변경하려는 비밀번호가 같습니다."라는 에러로 튕겨내려면
     // if (hashedPassword === user.password) {
     //     throw new Error("SAME_PASSWORD");
     // }
 
-    // "6개월 전에 변경된 비밀번호입니다."라는 에러로 튕겨 내려면
-    // 비밀번호 히스포니를 저장하고 있는 테이블을 따로 마련해야함
-    // 그 비밀먼호 히스토리를 모두 findMany로 가져온되
-    // for문을 돌려서 비교, 그후 시간과 함께 에러 리턴
+    // "5개월 전에 변경된 비밀번호입니다." 라는 에거로 튕겨내려면
+    // 비밀번호 히스토리를 저장하고 있는 테이블을 따로 마련해야 함
+    // 그 비밀번호 히스토리를 모두 findMany로 가져온 뒤
+    // for문을 돌려서 비교, 그 후 시간과 함께 에러 리턴
     // 구글이 이 방식인데 이렇게 해도 문제가 되지 않는 이유는
-    // 갖고 있는 비밀번호들이 전부 다 암호화 되어 있어서 구글도 실제 비밀번호가 뭔지는 모르기 때문
+    // 갖고 있는 비밀번호들에 전부 다 암호화 되어 있어서 구글도 실제 비밀번호가 무너지는 모르기 때문
 
-    await prisma.user.update({
+    return prisma.user.update({
         where: {
             id: userId,
         },
@@ -206,7 +207,7 @@ const updatePassword = async (userId: number, prevPw: string, pw: string) => {
 };
 
 const withdrawUser = async (userId: number, password: string) => {
-    // 사용자가 존재하는지 찾고
+    // 1. 사용자가 존재하는지 찾고
     // 데이터베이스에는 SELECT구문 - findFirst, findUnique, findMany
     // findUnique는 where절에 들어갈 수 있는게 unique칼러에 대해서만이기에 무조건 1개 or 0개
     // findFirst는 where절에 들어가는게 제한 없이, 여러게의 칼럼이 선택되고,
@@ -220,12 +221,12 @@ const withdrawUser = async (userId: number, password: string) => {
         throw new Error("NOT_FOUND_USER");
     }
 
-    // 지금 들어온 비밀번호가 DB 상 사용자가 비밀번호와 같은지 passwordUtil확인
+    // 2. 지금 들어온 비밀번호가 DB 상 사용자가 비밀번호와 같은지 passwordUtil확인
     const isPasswordValid = await passwordUtil.verifyPassword(password, existUser.password);
     if (!isPasswordValid) {
         throw new Error("INVALID_PASSWORD");
     }
-    // 사용자 정보에 deletedAt  현재시간으로 update
+    // 3. 사용자 정보에 deletedAt  현재시간으로 update
     return prisma.user.update({
         where: {
             id: userId,
