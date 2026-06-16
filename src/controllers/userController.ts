@@ -8,6 +8,19 @@ import { UpdatePasswordInputType } from "../schemas/user/updatePasswordSchema.ts
 import { UpdateUserInputType } from "../schemas/user/updateUserSchema.ts";
 import { WithdrawUserInputType } from "../schemas/user/withdrawUserSchema.ts";
 
+const getMe = (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+        res.status(401).send({
+            message: "유효하지 않은 사용자이거나 탈퇴한 계정입니다.",
+        });
+        return;
+    }
+    res.status(200).json({
+        message: "사용자 정보 확인이 완료되었습니다.",
+        data: req.user,
+    });
+};
+
 const createUser = async (req: Request, res: Response) => {
     try {
         // 프론트엔드가 요청한 정보를 꺼냄
@@ -227,6 +240,7 @@ const withdrawUser = async (req: AuthRequest, res: Response) => {
 };
 
 export default {
+    getMe,
     createUser,
     login,
     updateUser,
