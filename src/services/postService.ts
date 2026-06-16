@@ -1,6 +1,33 @@
 import prisma from "../config/prisma.ts";
 import { PostCreateInput } from "../generated/prisma/models/Post.ts";
 
+const getRecentPosts = async () => {
+    return prisma.post.findMany({
+        where: {
+            deletedAt: null,
+        },
+        orderBy: {
+            id: "desc",
+        },
+        take: 20,
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    nickname: true,
+                    email: true,
+                },
+            },
+            category: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    });
+};
+
 const getPostsByCategory = async (categoryId: number, page: number, size: number) => {
     const skip = (page - 1) * size;
 
@@ -202,7 +229,7 @@ const cancelVotePost = async (postId: number, userId: number) => {
 
     // 실제 삭제가 이루어져야 함
     // delete 내가 얘를 삭제했어 삭제된 vote 객체를
-   await prisma.vote.delete({
+    await prisma.vote.delete({
         where: {
             userId_postId: { userId, postId },
         },
@@ -218,6 +245,7 @@ const cancelVotePost = async (postId: number, userId: number) => {
 };
 
 export default {
+    getRecentPosts,
     getPostsByCategory,
     createPost,
     getPostById,

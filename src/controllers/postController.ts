@@ -5,6 +5,21 @@ import { PostCreateInput } from "../generated/prisma/models/Post.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
 import { VotePostInputType } from "../schemas/post/votePostSchema.ts";
 
+const getRecentPosts = async (req: Request, res: Response) => {
+    try {
+        const result = await postService.getRecentPosts();
+        res.status(200).json({
+            message: "최근 게시물 조회에 성공했습니다.",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "최근 게시물 조회중 서버 오류가 발생했습니다.",
+        });
+    }
+};
+
 const getPostsByCategory = async (req: Request<{ categoryId: string }>, res: Response) => {
     try {
         const categoryId = Number(req.params.categoryId);
@@ -194,7 +209,7 @@ const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Respons
         const postId = Number(req.params.postId);
         if (isNaN(postId)) {
             res.status(400).json({
-                message: "유효하지 않은 게시물 ID 입니다."
+                message: "유효하지 않은 게시물 ID 입니다.",
             });
             return;
         }
@@ -211,24 +226,25 @@ const cancelVotePost = async (req: AuthRequest<{ postId: string }>, res: Respons
         await postService.cancelVotePost(postId, userId);
         res.status(200).json({
             message: "투표가 취소되었습니다.",
-        })
+        });
     } catch (error) {
         if (error instanceof Error) {
             if (error.message === "NOT_VOTED") {
                 res.status(404).json({
-                    message: "취소할 투표 내용이 존재하지 않습니다."
+                    message: "취소할 투표 내용이 존재하지 않습니다.",
                 });
                 return;
             }
         }
         console.log(error);
         res.status(500).json({
-            message: "투표 취소중 서버 에러가 발생했습니다."
+            message: "투표 취소중 서버 에러가 발생했습니다.",
         });
     }
 };
 
 export default {
+    getRecentPosts,
     getPostsByCategory,
     createPost,
     getPostById,
