@@ -9,7 +9,7 @@ const getRecentPosts = async () => {
         orderBy: {
             id: "desc",
         },
-        take: 20,
+        take: 8,  // 원래는 20
         include: {
             user: {
                 select: {
