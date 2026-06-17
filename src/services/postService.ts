@@ -160,6 +160,7 @@ const getPostById = async (postId: number, userId?: number) => {
         }
     }
 
+    // 선생님이 만들어준 코드
     await prisma.post.update({
         where: {
             id: postId,
