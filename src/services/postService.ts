@@ -188,7 +188,7 @@ const getPostById = async (postId: number, userId?: number) => {
 
 const createPost = async (postData: PostCreateInput) => {
     // INSERT 쿼리 전송
-    await prisma.post.create({
+    return prisma.post.create({
         data: postData,
     });
 };
