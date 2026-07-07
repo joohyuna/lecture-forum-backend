@@ -24,7 +24,12 @@ const PORT = process.env.PORT || "8080";
 // cors({origin: "주소"})를 통해 특정 주소에 대홰서만 허용 증명 할 수 있음
 // 모든 요청에 대해
 // app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8081"], credentials: true }));
+app.use(
+    cors({
+        origin: ["http://localhost:5173", "http://localhost:8081", '"http://localhost:8082"'],
+        credentials: true,
+    }),
+);
 
 // express.json() : 요청(Request)의 본문(body)에서 JSON에 데이터를 객체로 변환 (파싱)하여 request.body에 저장
 // 모든 요청을 제이슨으로 변환하는
